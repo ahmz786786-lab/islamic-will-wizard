@@ -1076,3 +1076,29 @@ select.form-input {
         width: 100%;
     }
 }
+
+/* RTL Support for Will Document */
+.will-document [dir="rtl"] {
+    font-family: 'Amiri', 'Inter', serif;
+    line-height: 1.9;
+}
+
+.will-document [dir="rtl"] table {
+    direction: rtl;
+}
+
+.will-document [dir="rtl"] ol,
+.will-document [dir="rtl"] ul {
+    padding-right: 1.5rem;
+    padding-left: 0;
+}
+
+.will-document [dir="rtl"] .signature-line {
+    margin-left: auto;
+    margin-right: 0;
+}
+
+.will-document [dir="rtl"] .stamp-area {
+    margin-left: auto;
+    margin-right: 0;
+}
