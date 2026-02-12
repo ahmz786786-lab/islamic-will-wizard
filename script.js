@@ -808,6 +808,209 @@ function loadProgress() {
     }
 }
 
+// Generate Faraid table HTML
+function generateFaraidTable() {
+    const shares = calculateFaraid();
+
+    if (shares.length === 0) {
+        return '<p><em>No heirs identified. Please ensure family information is complete.</em></p>';
+    }
+
+    let totalShare = shares.reduce((sum, s) => sum + s.share, 0);
+
+    let html = `
+        <table style="width: 100%; margin: 1rem 0;">
+            <tr style="background: #1e3a5f; color: white;">
+                <th style="padding: 10px; text-align: left;">Heir</th>
+                <th style="padding: 10px; text-align: left;">Name</th>
+                <th style="padding: 10px; text-align: center;">Fraction</th>
+                <th style="padding: 10px; text-align: center;">Percentage</th>
+                <th style="padding: 10px; text-align: left;">Notes</th>
+            </tr>
+    `;
+
+    shares.forEach((s, idx) => {
+        const bgColor = idx % 2 === 0 ? '#ffffff' : '#f8fafc';
+        html += `
+            <tr style="background: ${bgColor};">
+                <td style="padding: 10px; font-weight: 600;">${s.heir}</td>
+                <td style="padding: 10px;">${s.name}</td>
+                <td style="padding: 10px; text-align: center;">${s.fraction}</td>
+                <td style="padding: 10px; text-align: center; font-weight: 600; color: #1e3a5f;">${s.share.toFixed(2)}%</td>
+                <td style="padding: 10px; font-size: 0.85rem; color: #64748b;">${s.note}</td>
+            </tr>
+        `;
+    });
+
+    html += `
+            <tr style="background: #1e3a5f; color: white; font-weight: 600;">
+                <td colspan="3" style="padding: 10px; text-align: right;">TOTAL:</td>
+                <td style="padding: 10px; text-align: center;">${totalShare.toFixed(2)}%</td>
+                <td style="padding: 10px;"></td>
+            </tr>
+        </table>
+    `;
+
+    if (Math.abs(totalShare - 100) > 0.1) {
+        html += `<p style="color: #dc2626; font-size: 0.9rem;"><strong>Note:</strong> Total does not equal 100%. This may be due to Radd (redistribution) or 'Awl (proportional reduction) rules. Please consult an Islamic scholar.</p>`;
+    }
+
+    return html;
+}
+
+// Calculate Faraid (Islamic Inheritance) Shares
+function calculateFaraid() {
+    const hasSpouse = formData.maritalStatus === 'married';
+    const hasChildren = formData.hasChildren === 'yes';
+    const fatherAlive = formData.fatherStatus === 'living';
+    const motherAlive = formData.motherStatus === 'living';
+
+    // Count children by gender
+    const children = formData.children || [];
+    const sons = children.filter(c => c.gender === 'male').length;
+    const daughters = children.filter(c => c.gender === 'female').length;
+    const totalChildren = sons + daughters;
+
+    // Determine testator gender from form
+    const testatorIsMale = formData.testatorGender !== 'female';
+
+    const shares = [];
+    let remainingShare = 100; // Start with 100%
+
+    // 1. SPOUSE SHARE
+    if (hasSpouse) {
+        let spouseShare;
+        if (testatorIsMale) {
+            // Wife's share
+            spouseShare = hasChildren ? 12.5 : 25; // 1/8 or 1/4
+        } else {
+            // Husband's share
+            spouseShare = hasChildren ? 25 : 50; // 1/4 or 1/2
+        }
+        shares.push({
+            heir: 'Spouse',
+            name: formData.spouseName || '____',
+            share: spouseShare,
+            fraction: testatorIsMale ? (hasChildren ? '1/8' : '1/4') : (hasChildren ? '1/4' : '1/2'),
+            note: testatorIsMale ? 'Wife' : 'Husband'
+        });
+        remainingShare -= spouseShare;
+    }
+
+    // 2. FATHER'S SHARE
+    if (fatherAlive) {
+        if (hasChildren) {
+            // Father gets 1/6 when there are children
+            shares.push({
+                heir: 'Father',
+                name: formData.fatherName || '____',
+                share: 16.67,
+                fraction: '1/6',
+                note: 'Fixed share (with children)'
+            });
+            remainingShare -= 16.67;
+        }
+        // If no children, father takes residue (calculated later)
+    }
+
+    // 3. MOTHER'S SHARE
+    if (motherAlive) {
+        let motherShare;
+        if (hasChildren || totalChildren >= 2) {
+            motherShare = 16.67; // 1/6
+        } else {
+            motherShare = 33.33; // 1/3
+        }
+        shares.push({
+            heir: 'Mother',
+            name: formData.motherName || '____',
+            share: motherShare,
+            fraction: hasChildren ? '1/6' : '1/3',
+            note: hasChildren ? 'Fixed share (with children)' : 'Fixed share (no children)'
+        });
+        remainingShare -= motherShare;
+    }
+
+    // 4. CHILDREN'S SHARES (from residue)
+    if (hasChildren && totalChildren > 0) {
+        if (sons > 0 && daughters > 0) {
+            // Sons get double daughters - calculate units
+            const totalUnits = (sons * 2) + daughters;
+            const unitValue = remainingShare / totalUnits;
+            const sonShare = (unitValue * 2).toFixed(2);
+            const daughterShare = unitValue.toFixed(2);
+
+            children.forEach((child, idx) => {
+                const isSon = child.gender === 'male';
+                shares.push({
+                    heir: isSon ? 'Son' : 'Daughter',
+                    name: child.name || `Child ${idx + 1}`,
+                    share: parseFloat(isSon ? sonShare : daughterShare),
+                    fraction: `Residue`,
+                    note: isSon ? '2 units (double daughter)' : '1 unit (half of son)'
+                });
+            });
+        } else if (sons > 0) {
+            // Only sons - share equally
+            const sonShare = (remainingShare / sons).toFixed(2);
+            children.forEach((child, idx) => {
+                shares.push({
+                    heir: 'Son',
+                    name: child.name || `Son ${idx + 1}`,
+                    share: parseFloat(sonShare),
+                    fraction: 'Residue',
+                    note: 'Equal share among sons'
+                });
+            });
+        } else if (daughters > 0) {
+            // Only daughters
+            let daughterTotal;
+            if (daughters === 1) {
+                daughterTotal = 50; // 1/2
+            } else {
+                daughterTotal = 66.67; // 2/3
+            }
+            // Cap at remaining share
+            daughterTotal = Math.min(daughterTotal, remainingShare);
+            const perDaughter = (daughterTotal / daughters).toFixed(2);
+
+            children.forEach((child, idx) => {
+                shares.push({
+                    heir: 'Daughter',
+                    name: child.name || `Daughter ${idx + 1}`,
+                    share: parseFloat(perDaughter),
+                    fraction: daughters === 1 ? '1/2' : '2/3 shared',
+                    note: daughters === 1 ? 'Only daughter' : `Shared among ${daughters} daughters`
+                });
+            });
+
+            remainingShare -= daughterTotal;
+
+            // If father alive and there's residue, father gets it
+            if (fatherAlive && remainingShare > 0) {
+                shares.push({
+                    heir: 'Father',
+                    name: formData.fatherName || '____',
+                    share: parseFloat(remainingShare.toFixed(2)),
+                    fraction: 'Residue',
+                    note: 'Residue after fixed shares'
+                });
+            }
+        }
+    } else if (!hasChildren && fatherAlive) {
+        // No children - father takes residue
+        shares.push({
+            heir: 'Father',
+            name: formData.fatherName || '____',
+            share: parseFloat(remainingShare.toFixed(2)),
+            fraction: 'Residue',
+            note: 'As residuary heir (no children)'
+        });
+    }
+
+    return shares;
+}
+
 // Generate review content
 function generateReview() {
     saveStepData();
@@ -948,18 +1151,27 @@ async function generateWill() {
         `}
 
         <h2>PART 6: ISLAMIC INHERITANCE (FARAID)</h2>
-        <p>I direct that the remainder of my estate shall be distributed according to the Islamic Law of Inheritance (Faraid) as prescribed in the Holy Quran and Sunnah.</p>
+        <p>I direct that the remainder of my estate (after payment of debts, expenses, and Wasiyyah) shall be distributed according to the Islamic Law of Inheritance (Faraid) as prescribed in the Holy Quran (Surah An-Nisa 4:11-12) and Sunnah.</p>
 
-        <h3>My Heirs:</h3>
-        <table>
-            <tr><th>Heir</th><th>Name</th><th>Share</th></tr>
-            ${formData.maritalStatus === 'married' ? `<tr><td>Spouse</td><td>${formData.spouseName || '____'}</td><td>As per Faraid</td></tr>` : ''}
-            ${formData.fatherStatus === 'living' ? `<tr><td>Father</td><td>${formData.fatherName || '____'}</td><td>As per Faraid</td></tr>` : ''}
-            ${formData.motherStatus === 'living' ? `<tr><td>Mother</td><td>${formData.motherName || '____'}</td><td>As per Faraid</td></tr>` : ''}
-            <tr><td colspan="3"><em>Children as recorded</em></td></tr>
-        </table>
+        <h3>Calculated Inheritance Shares:</h3>
+        <p><em>Based on the family information provided, the estimated Faraid shares are:</em></p>
+        ${generateFaraidTable()}
 
-        <p>I request that my Executor(s) consult with a qualified Islamic scholar for the correct calculation of Faraid shares.</p>
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 1rem; margin: 1rem 0;">
+            <h4 style="margin-top: 0; color: #1e3a5f;">Faraid Reference (Quranic Shares):</h4>
+            <table style="font-size: 0.85rem;">
+                <tr><th>Heir</th><th>With Children</th><th>Without Children</th></tr>
+                <tr><td>Wife</td><td>1/8 (12.5%)</td><td>1/4 (25%)</td></tr>
+                <tr><td>Husband</td><td>1/4 (25%)</td><td>1/2 (50%)</td></tr>
+                <tr><td>Father</td><td>1/6 (16.67%) + Residue</td><td>Residue</td></tr>
+                <tr><td>Mother</td><td>1/6 (16.67%)</td><td>1/3 (33.33%)</td></tr>
+                <tr><td>Son(s)</td><td colspan="2">Residue (double the share of daughters)</td></tr>
+                <tr><td>Daughter (alone)</td><td colspan="2">1/2 (50%)</td></tr>
+                <tr><td>Daughters (2+)</td><td colspan="2">2/3 (66.67%) shared equally</td></tr>
+            </table>
+        </div>
+
+        <p><strong>Important:</strong> These shares are calculated based on the information provided. I request that my Executor(s) consult with a qualified Islamic scholar (Mufti) for the final calculation of Faraid shares at the time of distribution, as circumstances may change.</p>
 
         ${formData.hasMinorChildren === 'yes' ? `
         <h2>PART 7: GUARDIANSHIP OF MINOR CHILDREN</h2>
