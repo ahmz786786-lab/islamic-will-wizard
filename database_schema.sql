@@ -1,87 +1,151 @@
 -- =============================================
--- ISLAMIC WILL GENERATOR - DATABASE SCHEMA
--- Run this in your Supabase SQL Editor
+-- ISLAMIC WILL GENERATOR - COMPLETE DATABASE SCHEMA
+-- Run this in Supabase SQL Editor
 -- =============================================
 
 -- Enable UUID extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- =============================================
--- ISLAMIC WILLS TABLE
--- =============================================
-CREATE TABLE IF NOT EXISTS islamic_wills (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+-- Drop existing table if exists (for fresh start)
+DROP TABLE IF EXISTS islamic_wills CASCADE;
 
-    -- Testator Information
+-- =============================================
+-- MAIN ISLAMIC WILLS TABLE
+-- =============================================
+CREATE TABLE islamic_wills (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    reference_number TEXT,
+
+    -- Testator Personal Information
     testator_name TEXT,
+    testator_aka TEXT,
     testator_email TEXT,
     testator_phone TEXT,
     testator_address TEXT,
     testator_dob DATE,
+    testator_pob TEXT,
+    testator_gender TEXT,
+    testator_ni TEXT,
+    testator_passport TEXT,
+    testator_country TEXT,
 
-    -- Will Details
-    will_type TEXT DEFAULT 'simple', -- simple, comprehensive
-    reference_number TEXT,
+    -- Will Type
+    will_type TEXT DEFAULT 'simple',
 
-    -- Family Information
-    marital_status TEXT,
-    spouse_name TEXT,
-    mahr_status TEXT,
-    mahr_amount NUMERIC DEFAULT 0,
-    has_children BOOLEAN DEFAULT false,
-
-    -- Executors
+    -- Executor 1
     executor1_name TEXT,
     executor1_address TEXT,
     executor1_relationship TEXT,
+    executor1_phone TEXT,
+    executor1_email TEXT,
+
+    -- Executor 2
     executor2_name TEXT,
     executor2_address TEXT,
     executor2_relationship TEXT,
+    executor2_phone TEXT,
+    executor2_email TEXT,
 
-    -- Funeral Wishes
+    -- Funeral Arrangements
     burial_location TEXT DEFAULT 'uk',
     repatriation_country TEXT,
     preferred_cemetery TEXT,
     preferred_mosque TEXT,
     funeral_instructions TEXT,
+    funeral_budget NUMERIC DEFAULT 0,
 
-    -- Special Preferences
-    organ_donation TEXT DEFAULT 'defer',
+    -- Family - Marital
+    marital_status TEXT,
+    spouse_name TEXT,
+    marriage_date DATE,
+    mahr_status TEXT,
+    mahr_amount NUMERIC DEFAULT 0,
+
+    -- Family - Children
+    has_children BOOLEAN DEFAULT false,
+
+    -- Family - Parents
+    father_status TEXT,
+    father_name TEXT,
+    mother_status TEXT,
+    mother_name TEXT,
+
+    -- Religious Obligations
+    unpaid_zakat NUMERIC DEFAULT 0,
+    fidyah_days INTEGER DEFAULT 0,
+    kaffarah NUMERIC DEFAULT 0,
+    hajj_status TEXT,
+    hajj_badal BOOLEAN DEFAULT false,
+    forgiven_debts TEXT,
+
+    -- Wasiyyah
     make_wasiyyah BOOLEAN DEFAULT false,
 
     -- Guardianship
-    guardian_name TEXT,
-    guardian_address TEXT,
-    guardian_relationship TEXT,
+    has_minor_children BOOLEAN DEFAULT false,
+    guardian1_name TEXT,
+    guardian1_address TEXT,
+    guardian1_relationship TEXT,
+    guardian1_phone TEXT,
+    guardian1_religion TEXT,
+    guardian2_name TEXT,
+    guardian2_address TEXT,
+    guardian2_relationship TEXT,
+    upbringing_wishes TEXT,
 
-    -- Full Form Data (JSON)
+    -- Special Circumstances
+    organ_donation TEXT DEFAULT 'defer',
+    has_non_muslim_relatives BOOLEAN DEFAULT false,
+    non_muslim_relatives TEXT,
+    preferred_scholar TEXT,
+    madhab TEXT,
+    additional_wishes TEXT,
+    people_forgiven TEXT,
+
+    -- JSON Data (stores all form data)
     will_data JSONB DEFAULT '{}',
+    children_data JSONB DEFAULT '[]',
+    debts_data JSONB DEFAULT '[]',
+    assets_data JSONB DEFAULT '{}',
+    wasiyyah_data JSONB DEFAULT '{}',
 
-    -- Generated Will Content
+    -- Generated Will
     will_html TEXT,
 
-    -- Status
-    status TEXT DEFAULT 'draft', -- draft, pending_review, approved, signed
+    -- Status & Workflow
+    status TEXT DEFAULT 'draft',
 
-    -- Signatures
+    -- Testator Signature
+    testator_signed BOOLEAN DEFAULT false,
     testator_signed_at TIMESTAMPTZ,
+
+    -- Witness 1
     witness1_name TEXT,
+    witness1_address TEXT,
+    witness1_occupation TEXT,
+    witness1_signed BOOLEAN DEFAULT false,
     witness1_signed_at TIMESTAMPTZ,
+
+    -- Witness 2
     witness2_name TEXT,
+    witness2_address TEXT,
+    witness2_occupation TEXT,
+    witness2_signed BOOLEAN DEFAULT false,
     witness2_signed_at TIMESTAMPTZ,
 
     -- Solicitor Certification
     solicitor_name TEXT,
     solicitor_firm TEXT,
-    solicitor_sra_number TEXT,
-    solicitor_signed_at TIMESTAMPTZ,
+    solicitor_sra TEXT,
     solicitor_certified BOOLEAN DEFAULT false,
+    solicitor_signed_at TIMESTAMPTZ,
 
     -- Mufti/Imam Certification
     mufti_name TEXT,
     mufti_institution TEXT,
-    mufti_signed_at TIMESTAMPTZ,
+    mufti_contact TEXT,
     mufti_certified BOOLEAN DEFAULT false,
+    mufti_signed_at TIMESTAMPTZ,
 
     -- Timestamps
     created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -89,94 +153,27 @@ CREATE TABLE IF NOT EXISTS islamic_wills (
 );
 
 -- =============================================
--- CHILDREN TABLE (linked to wills)
--- =============================================
-CREATE TABLE IF NOT EXISTS will_children (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    will_id UUID REFERENCES islamic_wills(id) ON DELETE CASCADE,
-    name TEXT,
-    gender TEXT,
-    date_of_birth DATE,
-    mother_name TEXT,
-    created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- =============================================
--- BENEFICIARIES TABLE (Wasiyyah recipients)
--- =============================================
-CREATE TABLE IF NOT EXISTS will_beneficiaries (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    will_id UUID REFERENCES islamic_wills(id) ON DELETE CASCADE,
-    beneficiary_type TEXT, -- charity, non_heir, adopted
-    name TEXT,
-    relationship TEXT,
-    percentage NUMERIC DEFAULT 0,
-    amount NUMERIC DEFAULT 0,
-    purpose TEXT,
-    created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- =============================================
--- ASSETS TABLE
--- =============================================
-CREATE TABLE IF NOT EXISTS will_assets (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    will_id UUID REFERENCES islamic_wills(id) ON DELETE CASCADE,
-    asset_type TEXT, -- property, bank_account, investment, business, vehicle, valuable, crypto
-    description TEXT,
-    location TEXT,
-    ownership_type TEXT,
-    estimated_value NUMERIC DEFAULT 0,
-    details JSONB DEFAULT '{}',
-    created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- =============================================
--- DEBTS TABLE
--- =============================================
-CREATE TABLE IF NOT EXISTS will_debts (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    will_id UUID REFERENCES islamic_wills(id) ON DELETE CASCADE,
-    debt_type TEXT, -- owed_by_testator, owed_to_testator, religious
-    creditor_debtor TEXT,
-    amount NUMERIC DEFAULT 0,
-    description TEXT,
-    forgiven BOOLEAN DEFAULT false,
-    created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- =============================================
--- INDEXES
--- =============================================
-CREATE INDEX IF NOT EXISTS idx_islamic_wills_email ON islamic_wills(testator_email);
-CREATE INDEX IF NOT EXISTS idx_islamic_wills_status ON islamic_wills(status);
-CREATE INDEX IF NOT EXISTS idx_islamic_wills_created ON islamic_wills(created_at);
-CREATE INDEX IF NOT EXISTS idx_will_children_will ON will_children(will_id);
-CREATE INDEX IF NOT EXISTS idx_will_beneficiaries_will ON will_beneficiaries(will_id);
-CREATE INDEX IF NOT EXISTS idx_will_assets_will ON will_assets(will_id);
-CREATE INDEX IF NOT EXISTS idx_will_debts_will ON will_debts(will_id);
-
--- =============================================
 -- AUTO-GENERATE REFERENCE NUMBER
 -- =============================================
 CREATE OR REPLACE FUNCTION generate_will_reference()
 RETURNS TRIGGER AS $$
 BEGIN
-    NEW.reference_number := 'IW-' || TO_CHAR(NOW(), 'YYYYMMDD') || '-' || SUBSTRING(NEW.id::TEXT, 1, 8);
+    NEW.reference_number := 'IW-' || TO_CHAR(NOW(), 'YYYYMMDD') || '-' || UPPER(SUBSTRING(NEW.id::TEXT, 1, 8));
     NEW.updated_at := NOW();
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS set_will_reference ON islamic_wills;
 CREATE TRIGGER set_will_reference
     BEFORE INSERT ON islamic_wills
     FOR EACH ROW
     EXECUTE FUNCTION generate_will_reference();
 
 -- =============================================
--- UPDATE TIMESTAMP TRIGGER
+-- AUTO-UPDATE TIMESTAMP
 -- =============================================
-CREATE OR REPLACE FUNCTION update_updated_at()
+CREATE OR REPLACE FUNCTION update_timestamp()
 RETURNS TRIGGER AS $$
 BEGIN
     NEW.updated_at := NOW();
@@ -184,20 +181,39 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER update_islamic_wills_timestamp
+DROP TRIGGER IF EXISTS update_will_timestamp ON islamic_wills;
+CREATE TRIGGER update_will_timestamp
     BEFORE UPDATE ON islamic_wills
     FOR EACH ROW
-    EXECUTE FUNCTION update_updated_at();
+    EXECUTE FUNCTION update_timestamp();
 
 -- =============================================
--- ROW LEVEL SECURITY (Optional - enable if needed)
+-- INDEXES FOR FASTER QUERIES
+-- =============================================
+CREATE INDEX idx_wills_testator_name ON islamic_wills(testator_name);
+CREATE INDEX idx_wills_testator_email ON islamic_wills(testator_email);
+CREATE INDEX idx_wills_reference ON islamic_wills(reference_number);
+CREATE INDEX idx_wills_status ON islamic_wills(status);
+CREATE INDEX idx_wills_created ON islamic_wills(created_at DESC);
+
+-- =============================================
+-- ENABLE ROW LEVEL SECURITY (Optional)
+-- Uncomment if you want to restrict access
 -- =============================================
 -- ALTER TABLE islamic_wills ENABLE ROW LEVEL SECURITY;
--- ALTER TABLE will_children ENABLE ROW LEVEL SECURITY;
--- ALTER TABLE will_beneficiaries ENABLE ROW LEVEL SECURITY;
--- ALTER TABLE will_assets ENABLE ROW LEVEL SECURITY;
--- ALTER TABLE will_debts ENABLE ROW LEVEL SECURITY;
+
+-- Allow anonymous inserts (for the web form)
+-- CREATE POLICY "Allow anonymous insert" ON islamic_wills FOR INSERT WITH CHECK (true);
+
+-- Allow anonymous select (for loading saved wills)
+-- CREATE POLICY "Allow anonymous select" ON islamic_wills FOR SELECT USING (true);
+
+-- Allow anonymous update
+-- CREATE POLICY "Allow anonymous update" ON islamic_wills FOR UPDATE USING (true);
+
+-- Allow anonymous delete
+-- CREATE POLICY "Allow anonymous delete" ON islamic_wills FOR DELETE USING (true);
 
 -- =============================================
--- DONE!
+-- DONE! Your database is ready.
 -- =============================================

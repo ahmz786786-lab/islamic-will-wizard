@@ -739,30 +739,108 @@ async function saveWillToDatabase() {
 
     try {
         const willRecord = {
+            // Testator Personal Info
             testator_name: formData.fullName || '',
+            testator_aka: formData.alsoKnownAs || '',
             testator_email: formData.email || '',
             testator_phone: formData.phone || '',
             testator_address: formData.address || '',
             testator_dob: formData.dateOfBirth || null,
+            testator_pob: formData.placeOfBirth || '',
+            testator_gender: formData.testatorGender || '',
+            testator_ni: formData.niNumber || '',
+            testator_passport: formData.passportNumber || '',
+            testator_country: formData.countryOfOrigin || '',
+
+            // Will Type
             will_type: formData.willType || 'simple',
-            marital_status: formData.maritalStatus || '',
-            spouse_name: formData.spouseName || '',
-            mahr_status: formData.mahrStatus || '',
-            mahr_amount: formData.mahrAmount ? parseFloat(formData.mahrAmount) : 0,
-            has_children: formData.hasChildren === 'yes',
+
+            // Executor 1
             executor1_name: formData.executor1Name || '',
             executor1_address: formData.executor1Address || '',
             executor1_relationship: formData.executor1Relationship || '',
+            executor1_phone: formData.executor1Phone || '',
+            executor1_email: formData.executor1Email || '',
+
+            // Executor 2
             executor2_name: formData.executor2Name || '',
+            executor2_address: formData.executor2Address || '',
+            executor2_relationship: formData.executor2Relationship || '',
+            executor2_phone: formData.executor2Phone || '',
+            executor2_email: formData.executor2Email || '',
+
+            // Funeral
             burial_location: formData.burialLocation || 'uk',
             repatriation_country: formData.repatriationCountry || '',
             preferred_cemetery: formData.preferredCemetery || '',
-            organ_donation: formData.organDonation || 'defer',
+            preferred_mosque: formData.preferredMosque || '',
+            funeral_instructions: formData.funeralInstructions || '',
+            funeral_budget: formData.funeralBudget ? parseFloat(formData.funeralBudget) : 0,
+
+            // Family
+            marital_status: formData.maritalStatus || '',
+            spouse_name: formData.spouseName || '',
+            marriage_date: formData.marriageDate || null,
+            mahr_status: formData.mahrStatus || '',
+            mahr_amount: formData.mahrAmount ? parseFloat(formData.mahrAmount) : 0,
+            has_children: formData.hasChildren === 'yes',
+            father_status: formData.fatherStatus || '',
+            father_name: formData.fatherName || '',
+            mother_status: formData.motherStatus || '',
+            mother_name: formData.motherName || '',
+
+            // Religious Obligations
+            unpaid_zakat: formData.unpaidZakat ? parseFloat(formData.unpaidZakat) : 0,
+            fidyah_days: formData.fidyahDays ? parseInt(formData.fidyahDays) : 0,
+            kaffarah: formData.kaffarah ? parseFloat(formData.kaffarah) : 0,
+            hajj_status: formData.hajjStatus || '',
+            hajj_badal: formData.arrangeHajjBadal || false,
+            forgiven_debts: formData.forgivenDebts || '',
+
+            // Wasiyyah
             make_wasiyyah: formData.makeWasiyyah === 'yes',
-            guardian_name: formData.guardian1Name || '',
-            will_data: formData, // Store full form data as JSON
-            status: 'draft',
-            created_at: new Date().toISOString()
+
+            // Guardianship
+            has_minor_children: formData.hasMinorChildren === 'yes',
+            guardian1_name: formData.guardian1Name || '',
+            guardian1_address: formData.guardian1Address || '',
+            guardian1_relationship: formData.guardian1Relationship || '',
+            guardian1_phone: formData.guardian1Phone || '',
+            guardian1_religion: formData.guardian1Religion || '',
+            guardian2_name: formData.guardian2Name || '',
+            guardian2_address: formData.guardian2Address || '',
+            guardian2_relationship: formData.guardian2Relationship || '',
+            upbringing_wishes: formData.otherUpbringingWishes || '',
+
+            // Special
+            organ_donation: formData.organDonation || 'defer',
+            has_non_muslim_relatives: formData.hasNonMuslimRelatives === 'yes',
+            non_muslim_relatives: formData.nonMuslimRelatives || '',
+            preferred_scholar: formData.preferredScholar || '',
+            madhab: formData.madhab || '',
+            additional_wishes: formData.additionalWishes || '',
+            people_forgiven: formData.peopleForgiven || '',
+
+            // All Data as JSON (backup)
+            will_data: formData,
+            children_data: formData.children || [],
+            debts_data: formData.debts || [],
+            assets_data: {
+                properties: formData.properties || [],
+                bankAccounts: formData.bankAccounts || [],
+                investments: formData.investments || [],
+                businesses: formData.businesses || [],
+                vehicles: formData.vehicles || [],
+                valuables: formData.valuables || []
+            },
+            wasiyyah_data: {
+                charities: formData.charities || [],
+                nonHeirs: formData.nonHeirs || [],
+                adopted: formData.adopted || []
+            },
+
+            // Status
+            status: 'draft'
         };
 
         const { data, error } = await supabaseClient
