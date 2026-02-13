@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Islamic LPA Generator | Lasting Power of Attorney</title>
+    <title>Standard LPA Generator | Lasting Power of Attorney</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -19,16 +19,16 @@
             <div class="logo">
                 <span class="logo-icon">📋</span>
                 <div>
-                    <h1>Islamic LPA Generator</h1>
-                    <p class="arabic">التوكيل الدائم الإسلامي</p>
+                    <h1>Standard LPA Generator</h1>
+                    <p>Lasting Power of Attorney</p>
                 </div>
             </div>
             <nav class="header-nav">
                 <a href="home.html" class="nav-link">Home</a>
                 <a href="index.html" class="nav-link" id="nav-islamic-will">Islamic Will</a>
-                <a href="lpa.html" class="nav-link nav-link-active" id="nav-islamic-lpa">Islamic LPA</a>
+                <a href="lpa.html" class="nav-link" id="nav-islamic-lpa">Islamic LPA</a>
                 <a href="will-standard.html" class="nav-link" id="nav-standard-will">Standard Will</a>
-                <a href="lpa-standard.html" class="nav-link" id="nav-standard-lpa">Standard LPA</a>
+                <a href="lpa-standard.html" class="nav-link nav-link-active" id="nav-standard-lpa">Standard LPA</a>
             </nav>
         </div>
     </header>
@@ -78,16 +78,15 @@
             <!-- ==================== STEP 1: Welcome & LPA Type ==================== -->
             <section class="step active" data-step="1">
                 <div class="step-header">
-                    <span class="step-icon">🕌</span>
-                    <h2>Islamic Lasting Power of Attorney</h2>
-                    <p class="bismillah">بِسْمِ اللهِ الرَّحْمٰنِ الرَّحِيْمِ</p>
-                    <p>In the Name of Allah, the Most Gracious, the Most Merciful</p>
+                    <span class="step-icon">📋</span>
+                    <h2>Lasting Power of Attorney</h2>
+                    <p>Create a legally compliant LPA for England & Wales</p>
                 </div>
 
-                <div class="info-box info-islamic">
-                    <h3>Why Do Muslims Need an LPA?</h3>
-                    <p>A Lasting Power of Attorney (LPA) allows you to appoint trusted people to make decisions on your behalf if you lose mental capacity. As Muslims, it is vital to ensure that whoever manages our affairs does so in accordance with Islamic principles.</p>
-                    <p style="margin-top: 0.75rem;">Without an LPA, decisions about your finances, health, and welfare could be made by someone unfamiliar with Islamic requirements - potentially resulting in riba-based investments, non-halal food in care settings, or medical decisions that conflict with Shariah.</p>
+                <div class="info-box">
+                    <h3>Why Do You Need an LPA?</h3>
+                    <p>A Lasting Power of Attorney (LPA) allows you to appoint trusted people to make decisions on your behalf if you lose mental capacity. Without an LPA, decisions about your finances, health, and welfare could be made by someone appointed by the Court of Protection, who may not know your wishes.</p>
+                    <p style="margin-top: 0.75rem;">An LPA gives you control over who will manage your affairs and ensures your preferences are respected even if you are unable to communicate them yourself.</p>
                 </div>
 
                 <div class="form-section">
@@ -100,7 +99,7 @@
                             <div class="radio-card-content">
                                 <div class="radio-card-icon">💰</div>
                                 <h4>Property & Financial Affairs (LP1F)</h4>
-                                <p>Covers decisions about your bank accounts, investments, property, bills, and Zakat payments.</p>
+                                <p>Covers decisions about your bank accounts, investments, property, bills, and tax payments.</p>
                             </div>
                         </label>
                         <label class="radio-card">
@@ -108,7 +107,7 @@
                             <div class="radio-card-content">
                                 <div class="radio-card-icon">🏥</div>
                                 <h4>Health & Welfare (LP1H)</h4>
-                                <p>Covers decisions about medical treatment, care arrangements, halal dietary needs, and end-of-life wishes.</p>
+                                <p>Covers decisions about medical treatment, care arrangements, dietary needs, and end-of-life wishes.</p>
                             </div>
                         </label>
                     </div>
@@ -120,18 +119,6 @@
                         Preview Official Government Form Structure
                     </button>
                     <p class="form-description" style="margin-top: 0.5rem;">See what sections the official LPA form contains and how your data will be used.</p>
-                </div>
-
-                <div class="form-section">
-                    <div class="info-box info-warning">
-                        <h4>Declaration of Faith (Shahada)</h4>
-                        <p class="arabic" style="margin: 0.5rem 0; font-size: 1.25rem;">أَشْهَدُ أَنْ لَا إِلَٰهَ إِلَّا ٱللَّٰهُ وَأَشْهَدُ أَنَّ مُحَمَّدًا رَسُولُ ٱللَّٰهِ</p>
-                        <p>"I bear witness that there is no god but Allah, and I bear witness that Muhammad is the Messenger of Allah."</p>
-                    </div>
-                    <label class="checkbox-label" style="margin-top: 1rem;">
-                        <input type="checkbox" id="shahadaConfirm">
-                        <span>I confirm the Declaration of Faith (Shahada) and wish to create an LPA that adheres to Islamic principles.</span>
-                    </label>
                 </div>
             </section>
 
@@ -151,7 +138,7 @@
                     <div class="form-grid">
                         <div class="form-group">
                             <label class="form-label required" for="donorName">Full Name</label>
-                            <input type="text" class="form-input" id="donorName" required placeholder="e.g., Muhammad Ahmad Khan">
+                            <input type="text" class="form-input" id="donorName" required placeholder="e.g., John Michael Smith">
                         </div>
                         <div class="form-group">
                             <label class="form-label" for="donorAka">Also Known As (if applicable)</label>
@@ -189,9 +176,9 @@
                     <p>Section 2 of the official LPA form - who will make decisions for you</p>
                 </div>
 
-                <div class="info-box info-islamic">
-                    <h4>Islamic Guidance on Choosing Attorneys</h4>
-                    <p>It is strongly recommended to appoint <strong>practising Muslim</strong> attorneys who understand Islamic principles regarding finances, investments, and welfare. They should be trustworthy (Ameen), competent, and willing to act in accordance with Shariah.</p>
+                <div class="info-box">
+                    <h4>Choosing Your Attorneys</h4>
+                    <p>Choose people you trust to make important decisions on your behalf. They should be reliable, competent, and willing to act in your best interests. You can appoint family members, friends, or professionals such as solicitors.</p>
                 </div>
 
                 <div class="form-section">
@@ -234,16 +221,9 @@
                     <div id="mixedDecisionDetails" style="display: none; margin-top: 1rem;">
                         <div class="form-group full-width">
                             <label class="form-label required" for="jointDecisions">Specify which decisions must be made jointly:</label>
-                            <textarea class="form-input" id="jointDecisions" rows="3" placeholder="e.g., Selling property, investments over £10,000, changes to Zakat calculations..."></textarea>
+                            <textarea class="form-input" id="jointDecisions" rows="3" placeholder="e.g., Selling property, investments over £10,000, major financial commitments..."></textarea>
                         </div>
                     </div>
-                </div>
-
-                <div class="form-section">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="attorneysAreMuslim">
-                        <span>I confirm that my appointed attorneys are practising Muslims who understand Islamic principles. <em>(Recommended but not required)</em></span>
-                    </label>
                 </div>
             </section>
 
@@ -284,9 +264,9 @@
 
                 <!-- Health & Welfare: Life-sustaining treatment -->
                 <div id="healthDecisionSection" style="display: none;">
-                    <div class="info-box info-islamic">
+                    <div class="info-box">
                         <h4>Life-Sustaining Treatment (Health & Welfare)</h4>
-                        <p>In Islam, life is sacred (Surah Al-Ma'idah 5:32). The decision about life-sustaining treatment should be made with careful consideration of Islamic principles. It is recommended to consult with an Islamic scholar on this matter.</p>
+                        <p>You need to decide whether your attorneys should have the authority to give or refuse consent to life-sustaining treatment on your behalf. This is an important decision - consider discussing it with your family and medical professionals.</p>
                     </div>
 
                     <div class="form-section">
@@ -295,7 +275,7 @@
                                 <input type="radio" name="lifeSustainingAuthority" value="give" checked>
                                 <div class="radio-card-content">
                                     <h4>I Give My Attorneys Authority</h4>
-                                    <p>Your attorneys can consent to or refuse life-sustaining treatment on your behalf, guided by Islamic principles.</p>
+                                    <p>Your attorneys can consent to or refuse life-sustaining treatment on your behalf.</p>
                                 </div>
                             </label>
                             <label class="radio-card">
@@ -320,7 +300,7 @@
 
                 <div class="info-box">
                     <h4>Why Appoint Replacement Attorneys?</h4>
-                    <p>Replacement attorneys step in if one of your original attorneys can no longer act (due to death, incapacity, or choice). It is recommended to appoint at least one replacement to ensure your Islamic preferences are always upheld.</p>
+                    <p>Replacement attorneys step in if one of your original attorneys can no longer act (due to death, incapacity, or choice). It is recommended to appoint at least one replacement to ensure continuity.</p>
                 </div>
 
                 <div class="form-section">
@@ -344,7 +324,7 @@
                 <div class="info-box">
                     <h4>Who Should Be Notified?</h4>
                     <p>These people will be notified when your LPA is being registered with the Office of the Public Guardian. They can raise concerns if they believe the LPA should not be registered. You can name up to 5 people.</p>
-                    <p style="margin-top: 0.5rem;">Consider notifying: a family member, your imam, a trusted friend, or a community leader.</p>
+                    <p style="margin-top: 0.5rem;">Consider notifying: a family member, a trusted friend, your solicitor, or a community leader.</p>
                 </div>
 
                 <div class="form-section">
@@ -357,98 +337,65 @@
                 </div>
             </section>
 
-            <!-- ==================== STEP 7: Islamic Instructions & Preferences ==================== -->
+            <!-- ==================== STEP 7: Preferences & Instructions ==================== -->
             <section class="step" data-step="7">
                 <div class="step-header">
-                    <span class="step-icon">🕋</span>
-                    <h2>Islamic Instructions & Preferences</h2>
-                    <p>Section 6 of the official LPA form - this is the most important Islamic section</p>
+                    <span class="step-icon">📝</span>
+                    <h2>Preferences & Instructions</h2>
+                    <p>Specify any preferences or instructions for your attorneys</p>
                 </div>
 
-                <div class="info-box info-islamic">
+                <div class="info-box">
                     <h4>Instructions vs Preferences</h4>
                     <p><strong>Instructions</strong> are BINDING - your attorneys MUST follow them. <strong>Preferences</strong> are guidance - your attorneys should consider them but have flexibility.</p>
-                    <p style="margin-top: 0.5rem;">The pre-selected Islamic instructions below will be written into Section 6 of the official government form.</p>
+                    <p style="margin-top: 0.5rem;">The options you select below will be written into Section 7 of the official government form.</p>
                 </div>
 
                 <!-- Property & Financial Instructions -->
                 <div id="propertyInstructions">
                     <div class="form-section">
-                        <h3>Binding Islamic Instructions (Property & Financial)</h3>
-                        <p class="form-description">Your attorneys MUST follow these instructions. Tick the ones you want included in Section 7 of the official form.</p>
+                        <h3>Financial Management Preferences</h3>
+                        <p class="form-description">Select the preferences you would like your attorneys to follow when managing your financial affairs.</p>
 
                         <div class="checkbox-group">
                             <label class="checkbox-label">
-                                <input type="checkbox" id="instructNoRiba" checked>
-                                <span><strong>Prohibition of Riba (Interest):</strong> My attorney must NOT place my money in any interest-bearing accounts, bonds, or instruments. No interest-based loans, mortgages, credit cards, or overdrafts. Any interest inadvertently received must be donated to charity.</span>
+                                <input type="checkbox" id="prefEthicalInvestments">
+                                <span><strong>Ethical Investments:</strong> Maintain ethical investments where possible, avoiding companies with poor environmental, social, or governance records.</span>
                             </label>
                             <label class="checkbox-label">
-                                <input type="checkbox" id="instructHalalInvestments" checked>
-                                <span><strong>Shariah-Compliant Investments:</strong> All investments must avoid companies involved in: alcohol, gambling, tobacco, conventional insurance, pork, adult entertainment, conventional banking, and weapons. Investments must be screened by a recognised Shariah advisory board. No speculative trading (Gharar).</span>
+                                <input type="checkbox" id="prefPayDebts">
+                                <span><strong>Prioritise Debt Repayment:</strong> Prioritise paying off debts before making other financial commitments.</span>
                             </label>
                             <label class="checkbox-label">
-                                <input type="checkbox" id="instructZakat" checked>
-                                <span><strong>Zakah Obligations:</strong> My attorney MUST calculate and distribute my annual Zakah obligations from my wealth. Zakah must be distributed to the eight categories of eligible recipients as specified in Surah At-Tawbah (9:60).</span>
+                                <input type="checkbox" id="prefPropertyMaintained">
+                                <span><strong>Property Management:</strong> Keep property managed and maintained to a reasonable standard.</span>
                             </label>
                             <label class="checkbox-label">
-                                <input type="checkbox" id="instructConsultScholar" checked>
-                                <span><strong>Financial Consultation Requirement:</strong> For any significant financial decision, my attorney must first consult with a recognised Mufti or Shariah advisory body to confirm the transaction is permissible. A written record of consultations should be maintained.</span>
+                                <input type="checkbox" id="prefCharitableDonations">
+                                <span><strong>Charitable Donations:</strong> Continue regular charitable donations from income where financially viable.</span>
                             </label>
                             <label class="checkbox-label">
-                                <input type="checkbox" id="instructPropertyMgmt">
-                                <span><strong>Property Management:</strong> My attorney must NOT rent out any of my properties for Haram purposes (alcohol-licensed premises, gambling, nightclubs). All rental agreements and property transactions must be Shariah-compliant.</span>
-                            </label>
-                        </div>
-
-                        <div class="form-group full-width" style="margin-top: 1rem;">
-                            <label class="form-label" for="zakatDate">Zakah Anniversary Date (if applicable)</label>
-                            <input type="text" class="form-input" id="zakatDate" placeholder="e.g., 1st Ramadan each year">
-                        </div>
-                        <div class="form-group full-width">
-                            <label class="form-label" for="consultThreshold">Consultation Threshold Amount (optional)</label>
-                            <input type="text" class="form-input" id="consultThreshold" placeholder="e.g., 5000 (for any transaction over this amount)">
-                        </div>
-                        <div class="form-group full-width">
-                            <label class="form-label" for="additionalInstructions">Additional Binding Instructions</label>
-                            <textarea class="form-input" id="additionalInstructions" rows="3" placeholder="Any other specific instructions your attorneys MUST follow..."></textarea>
-                        </div>
-                    </div>
-
-                    <div class="form-section">
-                        <h3>Preferences (Guidance for Attorneys)</h3>
-                        <p class="form-description">These are non-binding guidance. Your attorneys should consider them but have flexibility.</p>
-
-                        <div class="checkbox-group">
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="prefIslamicBanking" checked>
-                                <span><strong>Islamic Banking:</strong> I would prefer my banking to be conducted through Islamic banks or Shariah-compliant financial institutions (e.g., Gatehouse Bank, Al Rayan Bank).</span>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="prefSadaqah">
-                                <span><strong>Regular Charity:</strong> I would prefer that my attorney maintains a charitable giving practice of Sadaqah on my behalf, including during Ramadan and on Fridays.</span>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="prefDebtPriority" checked>
-                                <span><strong>Debt Settlement Priority:</strong> If I have outstanding debts, I would prefer these to be settled as a priority, as the Prophet (peace be upon him) emphasised the importance of settling debts.</span>
+                                <input type="checkbox" id="prefFinancialAdvisor">
+                                <span><strong>Consult Financial Advisor:</strong> Consult a financial advisor for major decisions involving investments, property sales, or large expenditures.</span>
                             </label>
                         </div>
 
                         <div class="form-grid" style="margin-top: 1rem;">
                             <div class="form-group">
-                                <label class="form-label" for="preferredIslamicBank">Preferred Islamic Bank</label>
-                                <input type="text" class="form-input" id="preferredIslamicBank" placeholder="e.g., Al Rayan Bank, Gatehouse Bank">
+                                <label class="form-label" for="preferredAdvisorBank">Preferred Financial Advisor / Bank</label>
+                                <input type="text" class="form-input" id="preferredAdvisorBank" placeholder="e.g., Smith & Co Financial Advisors, Barclays">
                             </div>
                             <div class="form-group">
-                                <label class="form-label" for="shariahAdvisor">Preferred Shariah Advisor/Scholar</label>
-                                <input type="text" class="form-input" id="shariahAdvisor" placeholder="Name of scholar or advisory board">
+                                <label class="form-label" for="consultThreshold">Threshold for Consultation</label>
+                                <input type="text" class="form-input" id="consultThreshold" placeholder="e.g., Consult me for decisions over £5,000">
                             </div>
                             <div class="form-group full-width">
-                                <label class="form-label" for="sadaqahDetails">Existing Sadaqah Jariyah Commitments (optional)</label>
-                                <textarea class="form-input" id="sadaqahDetails" rows="2" placeholder="List any regular charity donations, mosque contributions, sponsorships..."></textarea>
+                                <label class="form-label" for="additionalFinancialInstructions">Additional Financial Instructions</label>
+                                <textarea class="form-input" id="additionalFinancialInstructions" rows="3" placeholder="Any specific binding instructions your attorneys MUST follow regarding your financial affairs..."></textarea>
                             </div>
                             <div class="form-group full-width">
-                                <label class="form-label" for="additionalPreferences">Additional Preferences</label>
-                                <textarea class="form-input" id="additionalPreferences" rows="3" placeholder="Any other guidance for your attorneys regarding financial management..."></textarea>
+                                <label class="form-label" for="additionalFinancialPreferences">Additional Financial Preferences</label>
+                                <textarea class="form-input" id="additionalFinancialPreferences" rows="3" placeholder="Any other non-binding guidance for your attorneys regarding financial management..."></textarea>
                             </div>
                         </div>
                     </div>
@@ -457,125 +404,105 @@
                 <!-- Health & Welfare Instructions -->
                 <div id="healthInstructions" style="display: none;">
                     <div class="form-section">
-                        <h3>Binding Islamic Instructions (Health & Welfare)</h3>
-                        <p class="form-description">Your attorneys MUST follow these instructions. Tick the ones you want included in Section 7 of the official form.</p>
-
-                        <div class="checkbox-group">
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="instructHalalFood" checked>
-                                <span><strong>Halal Diet & Substances:</strong> All food and drink must be Halal. No pork, pork-derived products, or alcohol-based products. Where medication contains non-Halal ingredients, seek Halal-certified or vegetarian alternatives. Only if no alternative exists AND medication is essential for preserving life (Darurah) may non-Halal medication be used.</span>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="instructModesty" checked>
-                                <span><strong>Awrah (Modesty) & Personal Care:</strong> My body must not be exposed unnecessarily. Same-gender care must be arranged for all personal and intimate care tasks wherever reasonably possible. Appropriate clothing that covers my Awrah must be provided at all times, including during medical examinations.</span>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="instructMedicalDecisions" checked>
-                                <span><strong>Medical Decision-Making:</strong> My attorney must consult with a qualified Mufti/scholar before consenting to or refusing any major medical treatment. Active euthanasia or assisted dying must NEVER be authorised. Autopsy/post-mortem must NOT be performed unless legally required by a coroner.</span>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="instructPrayer" checked>
-                                <span><strong>Islamic Religious Practice:</strong> My attorney must ensure I am enabled to perform Salah (prayer), including clean space, prayer mat, Wudu facilities, and prayer times. During Ramadan, consult with doctor about fasting; if not advisable, arrange Fidyah payment. Turn me to face the Qiblah during serious illness. The Shahadah should be gently prompted at the time of approaching death.</span>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="instructMentalHealth">
-                                <span><strong>Mental Health Treatment:</strong> If psychiatric treatment is required, ensure therapy/counselling is respectful of my Islamic faith. Seek Muslim or faith-sensitive mental health professionals where available. No hypnosis or impermissible practices without scholarly consultation.</span>
-                            </label>
-                            <label class="checkbox-label">
-                                <input type="checkbox" id="instructScholarConsult" checked>
-                                <span><strong>Scholarly Consultation:</strong> My attorney must consult with a qualified Mufti/scholar before any major medical decision, life-altering treatment, or ethical dilemma. Written records of consultations should be maintained.</span>
-                            </label>
-                        </div>
-
-                        <div class="form-group full-width" style="margin-top: 1rem;">
-                            <label class="form-label" for="organDonation">Organ Donation Position</label>
-                            <select class="form-input" id="organDonation">
-                                <option value="">Not specified (consult your Mufti)</option>
-                                <option value="consent">I consent to organ donation after my death</option>
-                                <option value="no-consent">I do NOT consent to organ donation after my death</option>
-                            </select>
-                            <p class="form-hint">Scholars differ on this issue - please consult your Mufti and specify your position clearly.</p>
-                        </div>
-                        <div class="form-group full-width">
-                            <label class="form-label" for="healthAdditionalInstructions">Additional Binding Instructions</label>
-                            <textarea class="form-input" id="healthAdditionalInstructions" rows="3" placeholder="Any other specific health/welfare instructions your attorneys MUST follow..."></textarea>
-                        </div>
-                    </div>
-
-                    <div class="form-section">
-                        <h3>Preferences (Guidance for Attorneys)</h3>
-                        <p class="form-description">These are non-binding guidance. Your attorneys should consider them but have flexibility.</p>
+                        <h3>Care & Welfare Preferences</h3>
+                        <p class="form-description">Select the preferences you would like your attorneys to follow regarding your health and welfare.</p>
 
                         <div class="checkbox-group">
                             <label class="checkbox-label">
                                 <input type="checkbox" id="prefHomeCare" checked>
-                                <span><strong>Home Care:</strong> I would prefer to be cared for at home rather than in a care facility, for as long as practically and financially feasible.</span>
+                                <span><strong>Home Care:</strong> Prefer to be cared for at home where possible, for as long as practically and financially feasible.</span>
                             </label>
                             <label class="checkbox-label">
-                                <input type="checkbox" id="prefIslamicCareHome">
-                                <span><strong>Islamic Care Home:</strong> If residential care becomes necessary, I would prefer a care home that accommodates Islamic religious and dietary needs, ideally with experience of caring for Muslim residents.</span>
+                                <input type="checkbox" id="prefCareFacility">
+                                <span><strong>Preferred Care Facility:</strong> Prefer a particular care facility or type of residential home if home care is no longer viable.</span>
                             </label>
                             <label class="checkbox-label">
-                                <input type="checkbox" id="prefMuslimCarers">
-                                <span><strong>Muslim Healthcare Professionals:</strong> I would prefer Muslim healthcare professionals where available, particularly for intimate medical examinations.</span>
+                                <input type="checkbox" id="prefDietaryRequirements">
+                                <span><strong>Dietary Requirements:</strong> Prefer specific dietary requirements be maintained (e.g., vegetarian, vegan, allergies, cultural preferences).</span>
                             </label>
                             <label class="checkbox-label">
-                                <input type="checkbox" id="prefQuranRecitation" checked>
-                                <span><strong>Quran Recitation:</strong> I would prefer that Surah Yasin is recited near me during serious illness and that Islamic nasheeds or Quran recitation audio is played for me.</span>
+                                <input type="checkbox" id="prefRegularVisitors">
+                                <span><strong>Regular Visitors:</strong> Wish to have regular visitors from family, friends, and community members.</span>
                             </label>
                             <label class="checkbox-label">
-                                <input type="checkbox" id="prefRuqyah">
-                                <span><strong>Ruqyah:</strong> Ruqyah (spiritual healing through Quranic recitation) should be facilitated if requested by my family, alongside conventional medical treatment.</span>
+                                <input type="checkbox" id="prefCulturalPractices">
+                                <span><strong>Cultural/Spiritual Practices:</strong> Wish to continue cultural or spiritual practices that are important to me.</span>
                             </label>
                             <label class="checkbox-label">
-                                <input type="checkbox" id="prefMosqueVisitors" checked>
-                                <span><strong>Community Visitors:</strong> Visitors from my mosque community should be allowed and encouraged to visit me for companionship and dua (supplication).</span>
+                                <input type="checkbox" id="prefMentalHealthTreatment">
+                                <span><strong>Mental Health Treatment:</strong> If psychiatric treatment is required, ensure therapy and counselling are respectful of my personal values and beliefs.</span>
                             </label>
                         </div>
 
                         <div class="form-grid" style="margin-top: 1rem;">
-                            <div class="form-group">
-                                <label class="form-label" for="preferredMosqueLpa">Preferred Mosque / Imam</label>
-                                <input type="text" class="form-input" id="preferredMosqueLpa" placeholder="Name of mosque or imam for spiritual care">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label" for="namedScholar">Named Mufti/Scholar for Consultation</label>
-                                <input type="text" class="form-input" id="namedScholar" placeholder="Name of scholar to consult for decisions">
+                            <div class="form-group full-width">
+                                <label class="form-label" for="dietaryDetails">Dietary Requirements</label>
+                                <textarea class="form-input" id="dietaryDetails" rows="2" placeholder="Specify any dietary requirements, allergies, or preferences..."></textarea>
                             </div>
                             <div class="form-group full-width">
-                                <label class="form-label" for="livingPreferences">Living Arrangements Preferences</label>
-                                <textarea class="form-input" id="livingPreferences" rows="2" placeholder="e.g., Near my mosque, close to family..."></textarea>
+                                <label class="form-label" for="endOfLifePreferences">End of Life Preferences</label>
+                                <textarea class="form-input" id="endOfLifePreferences" rows="3" placeholder="Any wishes regarding end-of-life care, palliative care, pain management, or where you wish to spend your final days..."></textarea>
                             </div>
-                            <div class="form-group full-width">
-                                <label class="form-label" for="healthAdditionalPreferences">Additional Preferences</label>
-                                <textarea class="form-input" id="healthAdditionalPreferences" rows="3" placeholder="Any other guidance for your attorneys regarding health and welfare..."></textarea>
+                            <div class="form-group">
+                                <label class="form-label" for="organDonation">Organ Donation Preference</label>
+                                <select class="form-input" id="organDonation">
+                                    <option value="">Not specified</option>
+                                    <option value="yes-all">Yes - donate all suitable organs</option>
+                                    <option value="yes-some">Yes - donate specific organs only</option>
+                                    <option value="no">No - I do not wish to donate organs</option>
+                                    <option value="defer">Defer to my family's decision</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="namedMedicalProfessional">Named Medical Professional to Consult</label>
+                                <input type="text" class="form-input" id="namedMedicalProfessional" placeholder="e.g., Dr. Jane Smith, GP at Elm Surgery">
                             </div>
                         </div>
                     </div>
 
-                    <!-- Burial Wishes Section -->
                     <div class="form-section">
-                        <h3>Islamic Burial Wishes</h3>
+                        <h3>Living Arrangements</h3>
+                        <p class="form-description">Describe your preferences for where and how you would like to live if you lose capacity.</p>
+
+                        <div class="form-group full-width">
+                            <label class="form-label" for="livingArrangements">Living Arrangement Preferences</label>
+                            <textarea class="form-input" id="livingArrangements" rows="3" placeholder="e.g., Prefer to remain in my current home, close to family, near specific amenities or services..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Burial / Funeral Wishes</h3>
                         <p class="form-description">While LPA authority ends at death, including these ensures your attorney knows your wishes and can advocate for them during the transition period.</p>
 
                         <div class="checkbox-group">
                             <label class="checkbox-label">
-                                <input type="checkbox" id="prefIslamicBurial" checked>
-                                <span><strong>Islamic Burial:</strong> My body must be handled according to Islamic Shariah procedures. Ghusl (ritual washing) by qualified Muslims of the same gender. Shrouded in simple white Kafan. Burial as soon as possible (within 24 hours). Muslim cemetery facing the Qibla. Cremation is absolutely prohibited.</span>
+                                <input type="checkbox" id="prefBurialArrangements">
+                                <span><strong>Specific Burial Arrangements:</strong> I prefer specific burial arrangements (e.g., particular cemetery, burial vs. cremation, type of service).</span>
                             </label>
                             <label class="checkbox-label">
-                                <input type="checkbox" id="prefNoEmbalming" checked>
-                                <span><strong>No Embalming:</strong> Embalming should be avoided unless legally required.</span>
+                                <input type="checkbox" id="prefNoEmbalming">
+                                <span><strong>No Embalming:</strong> I do not wish to be embalmed unless legally required.</span>
                             </label>
                             <label class="checkbox-label">
-                                <input type="checkbox" id="prefJanazah" checked>
-                                <span><strong>Janazah Prayer:</strong> Janazah (funeral) prayer should be arranged at my preferred mosque. My attorney should request that my body is released promptly from hospital to facilitate timely Islamic burial.</span>
+                                <input type="checkbox" id="prefFuneralType">
+                                <span><strong>Preferred Funeral Type:</strong> I prefer a specific type of funeral service (e.g., religious ceremony, celebration of life, woodland burial, simple cremation).</span>
                             </label>
                         </div>
 
                         <div class="form-group full-width" style="margin-top: 1rem;">
-                            <label class="form-label" for="burialContact">Person/Imam to Contact Upon Death</label>
-                            <input type="text" class="form-input" id="burialContact" placeholder="Name and contact details of person to arrange funeral">
+                            <label class="form-label" for="emergencyEndOfLifeContact">Emergency Contact for End-of-Life</label>
+                            <input type="text" class="form-input" id="emergencyEndOfLifeContact" placeholder="Name and contact details of person to contact at end of life">
+                        </div>
+
+                        <div class="form-grid" style="margin-top: 1rem;">
+                            <div class="form-group full-width">
+                                <label class="form-label" for="additionalCareInstructions">Additional Care Instructions</label>
+                                <textarea class="form-input" id="additionalCareInstructions" rows="3" placeholder="Any specific binding instructions your attorneys MUST follow regarding your health and welfare..."></textarea>
+                            </div>
+                            <div class="form-group full-width">
+                                <label class="form-label" for="additionalCarePreferences">Additional Care Preferences</label>
+                                <textarea class="form-input" id="additionalCarePreferences" rows="3" placeholder="Any other non-binding guidance for your attorneys regarding your care and welfare..."></textarea>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -637,7 +564,7 @@
                 </div>
             </section>
 
-            <!-- ==================== STEP 9: Review ==================== -->
+            <!-- ==================== STEP 9: Review & Generate ==================== -->
             <section class="step" data-step="9">
                 <div class="step-header">
                     <span class="step-icon">📋</span>
@@ -648,99 +575,92 @@
                 <div id="reviewContent">
                     <p>Loading review...</p>
                 </div>
-            </section>
 
-            <!-- ==================== STEP 10: Generate & Download ==================== -->
-            <section class="step" data-step="10">
-                <div class="step-header">
-                    <span class="step-icon">📄</span>
-                    <h2>Your LPA Documents</h2>
-                    <p>Your Islamic LPA has been generated. You can view, print, or save both documents.</p>
-                </div>
-
-                <div class="info-box info-warning">
-                    <strong>Important Next Steps:</strong>
-                    <ol style="margin-top: 0.5rem; padding-left: 1.5rem;">
-                        <li>Print both documents and review them carefully</li>
-                        <li>Have a solicitor review the LPA before signing</li>
-                        <li>The Donor signs first, then the Certificate Provider, then each Attorney</li>
-                        <li>Register the LPA with the Office of the Public Guardian (fee applies)</li>
-                        <li>Optionally have an Islamic scholar certify the Islamic provisions</li>
-                    </ol>
-                </div>
-
-                <!-- Document Tabs -->
-                <div class="doc-tabs">
-                    <button class="doc-tab active" data-tab="islamic" onclick="showIslamicDoc()">Islamic LPA Document</button>
-                    <button class="doc-tab" data-tab="gov" onclick="showGovForm()">Official Government Form</button>
-                </div>
-
-                <!-- Islamic LPA Document -->
-                <div id="islamicLpaDoc" class="lpa-document">
-                    <p>Generating Islamic LPA document...</p>
-                </div>
-
-                <!-- Government Form Download Section -->
-                <div id="govFormDoc" style="display: none;">
-                    <div style="background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 2rem; box-shadow: var(--shadow-lg);">
-                        <div style="text-align: center; margin-bottom: 2rem;">
-                            <span style="font-size: 3rem; display: block; margin-bottom: 1rem;">📋</span>
-                            <h2 style="color: var(--primary); margin-bottom: 0.5rem;">Download Pre-filled Official Form</h2>
-                            <p style="color: var(--text-light);">Your wizard data will be filled into the official UK Government LP1F or LP1H form.</p>
-                        </div>
-
-                        <div id="govFormSummary" style="margin-bottom: 2rem;"></div>
-
-                        <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-bottom: 2rem;">
-                            <button class="btn btn-primary" onclick="fillAndDownloadPdf()" id="downloadPdfBtn" style="font-size: 1.1rem; padding: 1rem 2rem;">
-                                📥 Download Pre-filled PDF
-                            </button>
-                        </div>
-
-                        <div class="info-box info-warning" style="margin-bottom: 1.5rem;">
-                            <strong>What gets pre-filled:</strong>
-                            <ul style="margin-top: 0.5rem; padding-left: 1.5rem; font-size: 0.9rem;">
-                                <li>Section 1: Donor details (name, DOB, address, email)</li>
-                                <li>Section 2: Attorney details (up to 4 attorneys)</li>
-                                <li>Section 3: How attorneys make decisions</li>
-                                <li>Section 4: Replacement attorney details</li>
-                                <li id="govFormSection5Info">Section 5: When attorneys can act</li>
-                                <li>Section 6: People to notify</li>
-                                <li>Section 7: Islamic preferences and instructions</li>
-                                <li>Section 10: Certificate provider details</li>
-                            </ul>
-                        </div>
-
-                        <div class="info-box info-tip">
-                            <strong>You still need to complete manually:</strong>
-                            <ul style="margin-top: 0.5rem; padding-left: 1.5rem; font-size: 0.9rem;">
-                                <li>Section 9: Donor signature + witness details</li>
-                                <li>Section 10: Certificate provider signature</li>
-                                <li>Section 11: Attorney/replacement attorney signatures + witnesses</li>
-                                <li>Sections 12-15: Registration details, fee payment, and final signatures</li>
-                            </ul>
-                        </div>
-
-                        <p style="text-align: center; font-size: 0.85rem; color: var(--text-light); margin-top: 1rem;">
-                            The official form must be printed, signed in the correct order, and submitted to the Office of the Public Guardian for registration.
-                        </p>
+                <!-- Generate Section -->
+                <div class="form-section" style="margin-top: 2rem;">
+                    <div class="info-box info-warning">
+                        <strong>Important Next Steps:</strong>
+                        <ol style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                            <li>Print both documents and review them carefully</li>
+                            <li>Have a solicitor review the LPA before signing</li>
+                            <li>The Donor signs first, then the Certificate Provider, then each Attorney</li>
+                            <li>Register the LPA with the Office of the Public Guardian (fee applies)</li>
+                        </ol>
                     </div>
-                </div>
 
-                <!-- Action Buttons -->
-                <div class="action-buttons" style="margin-top: 2rem;">
-                    <button class="btn btn-primary" onclick="printCurrentDoc()">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
-                        Print Islamic LPA
-                    </button>
-                    <button class="btn btn-secondary" onclick="fillAndDownloadPdf()">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                        Download Official Form (PDF)
-                    </button>
-                    <button class="btn btn-outline-accent" onclick="saveProgress()">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
-                        Save Progress
-                    </button>
+                    <!-- Document Tabs -->
+                    <div class="doc-tabs">
+                        <button class="doc-tab active" data-tab="standard" onclick="showStandardDoc()">LPA Document</button>
+                        <button class="doc-tab" data-tab="gov" onclick="showGovForm()">Government Form</button>
+                    </div>
+
+                    <!-- Standard LPA Document -->
+                    <div id="standardLpaDoc" class="lpa-document">
+                        <p>Generating LPA document...</p>
+                    </div>
+
+                    <!-- Government Form Download Section -->
+                    <div id="govFormDoc" style="display: none;">
+                        <div style="background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 2rem; box-shadow: var(--shadow-lg);">
+                            <div style="text-align: center; margin-bottom: 2rem;">
+                                <span style="font-size: 3rem; display: block; margin-bottom: 1rem;">📋</span>
+                                <h2 style="color: var(--primary); margin-bottom: 0.5rem;">Download Pre-filled Official Form</h2>
+                                <p style="color: var(--text-light);">Your wizard data will be filled into the official UK Government LP1F or LP1H form.</p>
+                            </div>
+
+                            <div id="govFormSummary" style="margin-bottom: 2rem;"></div>
+
+                            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-bottom: 2rem;">
+                                <button class="btn btn-primary" onclick="fillAndDownloadPdf()" id="downloadPdfBtn" style="font-size: 1.1rem; padding: 1rem 2rem;">
+                                    📥 Download Pre-filled PDF
+                                </button>
+                            </div>
+
+                            <div class="info-box info-warning" style="margin-bottom: 1.5rem;">
+                                <strong>What gets pre-filled:</strong>
+                                <ul style="margin-top: 0.5rem; padding-left: 1.5rem; font-size: 0.9rem;">
+                                    <li>Section 1: Donor details (name, DOB, address, email)</li>
+                                    <li>Section 2: Attorney details (up to 4 attorneys)</li>
+                                    <li>Section 3: How attorneys make decisions</li>
+                                    <li>Section 4: Replacement attorney details</li>
+                                    <li id="govFormSection5Info">Section 5: When attorneys can act</li>
+                                    <li>Section 6: People to notify</li>
+                                    <li>Section 7: Preferences and instructions</li>
+                                    <li>Section 10: Certificate provider details</li>
+                                </ul>
+                            </div>
+
+                            <div class="info-box info-tip">
+                                <strong>You still need to complete manually:</strong>
+                                <ul style="margin-top: 0.5rem; padding-left: 1.5rem; font-size: 0.9rem;">
+                                    <li>Section 9: Donor signature + witness details</li>
+                                    <li>Section 10: Certificate provider signature</li>
+                                    <li>Section 11: Attorney/replacement attorney signatures + witnesses</li>
+                                    <li>Sections 12-15: Registration details, fee payment, and final signatures</li>
+                                </ul>
+                            </div>
+
+                            <p style="text-align: center; font-size: 0.85rem; color: var(--text-light); margin-top: 1rem;">
+                                The official form must be printed, signed in the correct order, and submitted to the Office of the Public Guardian for registration.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="action-buttons" style="margin-top: 2rem;">
+                        <button class="btn btn-primary" onclick="printCurrentDoc()">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                            Print LPA
+                        </button>
+                        <button class="btn btn-secondary" onclick="fillAndDownloadPdf()">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                            Download Official Form (PDF)
+                        </button>
+                        <button class="btn btn-outline-accent" onclick="saveProgress()">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
+                            Save to Database
+                        </button>
+                    </div>
                 </div>
             </section>
 
@@ -764,7 +684,7 @@
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
-            <p>Islamic LPA Generator - Compliant with the Mental Capacity Act 2005</p>
+            <p>Standard LPA Generator - Compliant with the Mental Capacity Act 2005</p>
             <p style="margin-top: 0.25rem; font-size: 0.75rem;">This tool generates LPA documents for guidance purposes. Please have all documents reviewed by a qualified solicitor before signing and registering.</p>
         </div>
     </footer>
@@ -803,6 +723,21 @@
                         Edit LPA
                     </button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div class="modal" id="successModal" style="display: none;">
+        <div class="modal-content" style="max-width: 450px;">
+            <div class="modal-header">
+                <h3>Success</h3>
+                <button class="modal-close" onclick="closeSuccessModal()">&times;</button>
+            </div>
+            <div class="modal-body" style="text-align: center;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">✅</div>
+                <p id="successMessage">Your LPA has been saved successfully.</p>
+                <button class="btn btn-primary" style="margin-top: 1.5rem;" onclick="closeSuccessModal()">OK</button>
             </div>
         </div>
     </div>
@@ -857,11 +792,11 @@
                     </div>
                 </div>
 
-                <div class="gov-form-section" style="margin-bottom: 0.75rem; border-color: #1b7340;">
-                    <div><span class="gov-section-number" style="background: #1b7340;">6</span></div>
+                <div class="gov-form-section" style="margin-bottom: 0.75rem; border-color: var(--primary);">
+                    <div><span class="gov-section-number" style="background: var(--primary);">6</span></div>
                     <div>
-                        <div class="gov-section-title" style="background: #d1fae5; font-weight: 700;">Preferences and instructions (Islamic)</div>
-                        <p style="font-size: 0.85rem; color: #1b7340; padding: 0.5rem; font-weight: 500;">This is where your Islamic instructions will be written - the most important section for Muslims</p>
+                        <div class="gov-section-title" style="font-weight: 700;">Preferences and instructions</div>
+                        <p style="font-size: 0.85rem; color: #6b7280; padding: 0.5rem; font-weight: 500;">Your preferences and binding instructions for your attorneys</p>
                     </div>
                 </div>
 
@@ -916,6 +851,6 @@
     </div>
 
     <script src="config.js"></script>
-    <script src="lpa-script.js"></script>
+    <script src="lpa-standard-script.js"></script>
 </body>
 </html>

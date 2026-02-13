@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Will & LPA Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#9878;</text></svg>">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="home-container">
+            <div style="display:flex;justify-content:space-between;align-items:center;">
+                <div class="logo">
+                    <span class="logo-icon">&#9878;</span>
+                    <div>
+                        <h1 class="brand-name" style="font-size:1.25rem;margin:0;">Will & LPA Generator</h1>
+                        <p style="font-size:0.8rem;opacity:0.8;margin:0;">Professional Legal Document Preparation</p>
+                    </div>
+                </div>
+                <nav class="header-nav">
+                    <a href="home.html" class="nav-link nav-link-active">Home</a>
+                    <a href="index.html" class="nav-link" id="nav-islamic-will">Islamic Will</a>
+                    <a href="lpa.html" class="nav-link" id="nav-islamic-lpa">Islamic LPA</a>
+                    <a href="will-standard.html" class="nav-link" id="nav-standard-will">Standard Will</a>
+                    <a href="lpa-standard.html" class="nav-link" id="nav-standard-lpa">Standard LPA</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <div class="home-container">
+        <div class="home-hero">
+            <h1 class="brand-name">Will & LPA Generator</h1>
+            <p>Create legally compliant Wills and Lasting Powers of Attorney with our step-by-step guided wizards. Choose the version that best suits your needs.</p>
+        </div>
+
+        <!-- Tool Cards Grid -->
+        <div class="home-grid">
+            <!-- Islamic Will -->
+            <a href="index.html" class="home-card home-card-islamic" id="card-islamic-will">
+                <span class="home-card-badge">Islamic</span>
+                <div class="home-card-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                </div>
+                <h3>Islamic Will</h3>
+                <p>Shariah-compliant Will with Faraid inheritance distribution, Wasiyyah (bequests), religious obligations, and Mufti certification.</p>
+                <span class="home-card-arrow">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </span>
+            </a>
+
+            <!-- Islamic LPA -->
+            <a href="lpa.html" class="home-card home-card-islamic" id="card-islamic-lpa">
+                <span class="home-card-badge">Islamic</span>
+                <div class="home-card-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"></path><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"></path></svg>
+                </div>
+                <h3>Islamic LPA</h3>
+                <p>Lasting Power of Attorney with Islamic guidance including halal finance, Shariah-compliant care preferences, and Islamic end-of-life wishes.</p>
+                <span class="home-card-arrow">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </span>
+            </a>
+
+            <!-- Standard Will -->
+            <a href="will-standard.html" class="home-card home-card-standard" id="card-standard-will">
+                <span class="home-card-badge">Standard</span>
+                <div class="home-card-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                </div>
+                <h3>Standard Will</h3>
+                <p>UK-compliant Will with full testamentary freedom. Distribute your estate to any beneficiaries with percentage-based allocation.</p>
+                <span class="home-card-arrow">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </span>
+            </a>
+
+            <!-- Standard LPA -->
+            <a href="lpa-standard.html" class="home-card home-card-standard" id="card-standard-lpa">
+                <span class="home-card-badge">Standard</span>
+                <div class="home-card-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"></path><path d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"></path></svg>
+                </div>
+                <h3>Standard LPA</h3>
+                <p>Lasting Power of Attorney for Property & Financial Affairs or Health & Welfare. Includes official UK government form generation.</p>
+                <span class="home-card-arrow">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="home-container">
+            <p class="brand-footer">&copy; 2025 Will & LPA Generator. All rights reserved.</p>
+            <p>Professional legal document preparation service</p>
+        </div>
+    </footer>
+</body>
+</html>

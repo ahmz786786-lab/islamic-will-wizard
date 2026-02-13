@@ -403,5 +403,289 @@ ALTER TABLE islamic_lpas ADD COLUMN IF NOT EXISTS pref_janazah BOOLEAN DEFAULT f
 ALTER TABLE islamic_lpas ADD COLUMN IF NOT EXISTS burial_contact TEXT;
 
 -- =============================================
+-- STANDARD WILLS TABLE
+-- =============================================
+DROP TABLE IF EXISTS standard_wills CASCADE;
+
+CREATE TABLE standard_wills (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    reference_number TEXT,
+
+    -- Testator Personal Information
+    testator_name TEXT,
+    testator_aka TEXT,
+    testator_email TEXT,
+    testator_phone TEXT,
+    testator_address TEXT,
+    testator_dob DATE,
+    testator_pob TEXT,
+    testator_gender TEXT,
+    testator_ni TEXT,
+    testator_passport TEXT,
+    testator_country TEXT,
+
+    -- Will Type
+    will_type TEXT DEFAULT 'simple',
+
+    -- Executor 1
+    executor1_name TEXT,
+    executor1_address TEXT,
+    executor1_relationship TEXT,
+    executor1_phone TEXT,
+    executor1_email TEXT,
+
+    -- Executor 2
+    executor2_name TEXT,
+    executor2_address TEXT,
+    executor2_relationship TEXT,
+    executor2_phone TEXT,
+    executor2_email TEXT,
+
+    -- Funeral Arrangements
+    funeral_type TEXT DEFAULT 'burial',
+    funeral_style TEXT,
+    funeral_location TEXT,
+    cremation_ashes TEXT,
+    funeral_instructions TEXT,
+    funeral_budget NUMERIC DEFAULT 0,
+
+    -- Family - Marital
+    marital_status TEXT,
+    spouse_name TEXT,
+    marriage_date DATE,
+
+    -- Family - Children
+    has_children BOOLEAN DEFAULT false,
+
+    -- Family - Parents
+    father_status TEXT,
+    father_name TEXT,
+    mother_status TEXT,
+    mother_name TEXT,
+
+    -- Guardianship
+    has_minor_children BOOLEAN DEFAULT false,
+    guardian1_name TEXT,
+    guardian1_address TEXT,
+    guardian1_relationship TEXT,
+    guardian1_phone TEXT,
+    guardian2_name TEXT,
+    guardian2_address TEXT,
+    guardian2_relationship TEXT,
+    upbringing_wishes TEXT,
+
+    -- Special Circumstances
+    organ_donation TEXT DEFAULT 'defer',
+    additional_wishes TEXT,
+
+    -- JSON Data
+    will_data JSONB DEFAULT '{}',
+    children_data JSONB DEFAULT '[]',
+    debts_data JSONB DEFAULT '[]',
+    debts_owed_data JSONB DEFAULT '[]',
+    assets_data JSONB DEFAULT '{}',
+    beneficiaries_data JSONB DEFAULT '{}',
+
+    -- Generated Will
+    will_html TEXT,
+
+    -- Status & Workflow
+    status TEXT DEFAULT 'draft',
+
+    -- Testator Signature
+    testator_signed BOOLEAN DEFAULT false,
+    testator_signed_at TIMESTAMPTZ,
+
+    -- Witness 1
+    witness1_name TEXT,
+    witness1_address TEXT,
+    witness1_occupation TEXT,
+    witness1_signed BOOLEAN DEFAULT false,
+    witness1_signed_at TIMESTAMPTZ,
+
+    -- Witness 2
+    witness2_name TEXT,
+    witness2_address TEXT,
+    witness2_occupation TEXT,
+    witness2_signed BOOLEAN DEFAULT false,
+    witness2_signed_at TIMESTAMPTZ,
+
+    -- Solicitor Certification
+    solicitor_name TEXT,
+    solicitor_firm TEXT,
+    solicitor_sra TEXT,
+    solicitor_certified BOOLEAN DEFAULT false,
+    solicitor_signed_at TIMESTAMPTZ,
+
+    -- Timestamps
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Auto-generate Standard Will reference number
+CREATE OR REPLACE FUNCTION generate_standard_will_reference()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.reference_number := 'SW-' || TO_CHAR(NOW(), 'YYYYMMDD') || '-' || UPPER(SUBSTRING(NEW.id::TEXT, 1, 8));
+    NEW.updated_at := NOW();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS set_standard_will_reference ON standard_wills;
+CREATE TRIGGER set_standard_will_reference
+    BEFORE INSERT ON standard_wills
+    FOR EACH ROW
+    EXECUTE FUNCTION generate_standard_will_reference();
+
+DROP TRIGGER IF EXISTS update_standard_will_timestamp ON standard_wills;
+CREATE TRIGGER update_standard_will_timestamp
+    BEFORE UPDATE ON standard_wills
+    FOR EACH ROW
+    EXECUTE FUNCTION update_timestamp();
+
+-- Indexes for Standard Wills
+CREATE INDEX idx_std_wills_testator_name ON standard_wills(testator_name);
+CREATE INDEX idx_std_wills_testator_email ON standard_wills(testator_email);
+CREATE INDEX idx_std_wills_reference ON standard_wills(reference_number);
+CREATE INDEX idx_std_wills_status ON standard_wills(status);
+CREATE INDEX idx_std_wills_created ON standard_wills(created_at DESC);
+
+-- =============================================
+-- STANDARD LPAS TABLE
+-- =============================================
+DROP TABLE IF EXISTS standard_lpas CASCADE;
+
+CREATE TABLE standard_lpas (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    reference_number TEXT,
+
+    -- LPA Type
+    lpa_type TEXT NOT NULL DEFAULT 'property',
+
+    -- Donor Information
+    donor_name TEXT,
+    donor_aka TEXT,
+    donor_dob DATE,
+    donor_address TEXT,
+    donor_email TEXT,
+    donor_phone TEXT,
+    donor_ni TEXT,
+
+    -- Attorney Decision Type
+    attorney_decision_type TEXT DEFAULT 'jointly',
+    joint_decisions_detail TEXT,
+
+    -- Type-specific
+    attorneys_can_act TEXT DEFAULT 'registered',
+    life_sustaining_authority TEXT DEFAULT 'give',
+
+    -- Certificate Provider
+    certificate_provider_name TEXT,
+    certificate_provider_address TEXT,
+    certificate_provider_type TEXT,
+    certificate_provider_relationship TEXT,
+
+    -- Standard Preferences (not Islamic)
+    financial_preferences TEXT,
+    care_preferences TEXT,
+    dietary_requirements TEXT,
+    organ_donation TEXT,
+    additional_instructions TEXT,
+    additional_preferences TEXT,
+
+    -- JSON data
+    lpa_data JSONB DEFAULT '{}',
+    attorneys_data JSONB DEFAULT '[]',
+    replacement_attorneys_data JSONB DEFAULT '[]',
+    notify_persons_data JSONB DEFAULT '[]',
+
+    -- Generated documents
+    lpa_html TEXT,
+    gov_form_html TEXT,
+
+    -- Status
+    status TEXT DEFAULT 'draft',
+
+    -- Donor signature
+    donor_signed BOOLEAN DEFAULT false,
+    donor_signed_at TIMESTAMPTZ,
+
+    -- Timestamps
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Auto-generate Standard LPA reference number
+CREATE OR REPLACE FUNCTION generate_standard_lpa_reference()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.reference_number := 'SLPA-' || TO_CHAR(NOW(), 'YYYYMMDD') || '-' || UPPER(SUBSTRING(NEW.id::TEXT, 1, 8));
+    NEW.updated_at := NOW();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS set_standard_lpa_reference ON standard_lpas;
+CREATE TRIGGER set_standard_lpa_reference
+    BEFORE INSERT ON standard_lpas
+    FOR EACH ROW
+    EXECUTE FUNCTION generate_standard_lpa_reference();
+
+DROP TRIGGER IF EXISTS update_standard_lpa_timestamp ON standard_lpas;
+CREATE TRIGGER update_standard_lpa_timestamp
+    BEFORE UPDATE ON standard_lpas
+    FOR EACH ROW
+    EXECUTE FUNCTION update_timestamp();
+
+-- Indexes for Standard LPAs
+CREATE INDEX idx_std_lpas_donor_name ON standard_lpas(donor_name);
+CREATE INDEX idx_std_lpas_donor_email ON standard_lpas(donor_email);
+CREATE INDEX idx_std_lpas_reference ON standard_lpas(reference_number);
+CREATE INDEX idx_std_lpas_status ON standard_lpas(status);
+CREATE INDEX idx_std_lpas_type ON standard_lpas(lpa_type);
+CREATE INDEX idx_std_lpas_created ON standard_lpas(created_at DESC);
+
+-- =============================================
+-- BUSINESS CONFIG TABLE (White-Label)
+-- =============================================
+DROP TABLE IF EXISTS business_config CASCADE;
+
+CREATE TABLE business_config (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+
+    -- Branding
+    business_name TEXT DEFAULT 'Will & LPA Generator',
+    business_logo_url TEXT,
+    primary_color TEXT DEFAULT '#1e3a5f',
+    secondary_color TEXT DEFAULT '#d4af37',
+    accent_color TEXT DEFAULT '#1b7340',
+
+    -- Feature Toggles
+    enable_islamic_will BOOLEAN DEFAULT true,
+    enable_islamic_lpa BOOLEAN DEFAULT true,
+    enable_standard_will BOOLEAN DEFAULT true,
+    enable_standard_lpa BOOLEAN DEFAULT true,
+
+    -- Contact Info
+    contact_email TEXT,
+    contact_phone TEXT,
+    website_url TEXT,
+
+    -- Footer
+    footer_text TEXT,
+
+    -- Timestamps
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+DROP TRIGGER IF EXISTS update_business_config_timestamp ON business_config;
+CREATE TRIGGER update_business_config_timestamp
+    BEFORE UPDATE ON business_config
+    FOR EACH ROW
+    EXECUTE FUNCTION update_timestamp();
+
+-- =============================================
 -- DONE! Your database is ready.
 -- =============================================
