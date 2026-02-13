@@ -1,24 +1,27 @@
 // ========================================
-// Admin Panel - White Label Configuration
+// Admin Dashboard - Super Admin Panel
+// You (the admin) manage all businesses here
 // ========================================
 
 const SUPABASE_URL = 'https://gyvzfylmvocrriwoemhf.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5dnpmeWxtdm9jcnJpd29lbWhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA5MjAyOTEsImV4cCI6MjA4NjQ5NjI5MX0.H6E2iAWkqi82szU52_jtbBSyzPKTlAt5jqgRsYt9Kfk';
 
 let supabaseClient = null;
-let configId = null; // ID of existing config row (for updates)
-let currentUser = null; // Logged-in user
+let currentUser = null;
+let allBusinesses = []; // All business configs
+let editingId = null; // ID of business being edited (null = adding new)
+
+// ========================================
+// Initialization
+// ========================================
 
 function initSupabase() {
     try {
         if (window.supabase && window.supabase.createClient) {
             supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            console.log('Supabase initialized for admin');
-        } else {
-            console.warn('Supabase library not loaded');
         }
     } catch (e) {
-        console.warn('Supabase initialization error:', e);
+        console.warn('Supabase init error:', e);
     }
 }
 
@@ -32,8 +35,7 @@ async function checkAuth() {
         const { data: { session } } = await supabaseClient.auth.getSession();
         if (session) {
             currentUser = session.user;
-            showAdminPanel();
-            showLoggedInUser();
+            showDashboard();
             return true;
         }
     } catch (e) {
@@ -55,7 +57,7 @@ async function adminLogin() {
     }
 
     if (!supabaseClient) {
-        errorEl.textContent = 'Supabase not connected. Please refresh and try again.';
+        errorEl.textContent = 'Unable to connect. Please refresh and try again.';
         errorEl.style.display = 'block';
         return;
     }
@@ -69,9 +71,8 @@ async function adminLogin() {
         }
         if (data.session) {
             currentUser = data.session.user;
-            showAdminPanel();
-            showLoggedInUser();
-            loadConfig();
+            showDashboard();
+            loadBusinesses();
         }
     } catch (e) {
         errorEl.textContent = 'Login failed: ' + e.message;
@@ -84,274 +85,344 @@ async function adminLogout() {
         await supabaseClient.auth.signOut();
     }
     currentUser = null;
-    configId = null;
+    allBusinesses = [];
     document.getElementById('loginScreen').style.display = '';
-    document.getElementById('adminHeader').style.display = 'none';
-    document.getElementById('adminPanel').style.display = 'none';
-    document.getElementById('saveBar').style.display = 'none';
+    document.getElementById('dashboardScreen').style.display = 'none';
     document.getElementById('loginPassword').value = '';
 }
 
-function showAdminPanel() {
+function showDashboard() {
     document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('adminHeader').style.display = '';
-    document.getElementById('adminPanel').style.display = '';
-    document.getElementById('saveBar').style.display = '';
-}
-
-function showLoggedInUser() {
-    const el = document.getElementById('loggedInUser');
-    if (el && currentUser) {
-        el.textContent = currentUser.email;
+    document.getElementById('dashboardScreen').style.display = '';
+    if (currentUser) {
+        document.getElementById('loggedInUser').textContent = currentUser.email;
     }
 }
 
-// Allow Enter key to submit login
+// Enter key to login
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Enter' && document.getElementById('loginScreen').style.display !== 'none') {
         adminLogin();
     }
 });
 
-// Load existing config from database
-async function loadConfig() {
-    if (!supabaseClient) {
-        showStatus('Supabase not connected. Changes will not be saved to database.', 'warning');
-        return;
-    }
+// ========================================
+// Load & Render Businesses
+// ========================================
+
+async function loadBusinesses() {
+    if (!supabaseClient) return;
 
     try {
-        // Load config for the logged-in user
-        let query = supabaseClient
+        const { data, error } = await supabaseClient
             .from('business_config')
-            .select('*');
-
-        if (currentUser) {
-            query = query.eq('user_id', currentUser.id);
-        }
-
-        const { data, error } = await query.limit(1).single();
+            .select('*')
+            .order('created_at', { ascending: false });
 
         if (data && !error) {
-            configId = data.id;
-            populateForm(data);
+            allBusinesses = data;
         } else {
-            console.log('No existing config found, using defaults');
+            allBusinesses = [];
         }
     } catch (e) {
-        console.log('Config load error (table may not exist yet):', e.message);
+        console.log('Load error:', e.message);
+        allBusinesses = [];
     }
+
+    renderBusinessCards();
 }
 
-// Populate form fields from config data
-function populateForm(config) {
-    if (config.business_name) document.getElementById('businessName').value = config.business_name;
-    if (config.business_logo_url) {
-        document.getElementById('businessLogoUrl').value = config.business_logo_url;
-        updateLogoPreview(config.business_logo_url);
-    }
-    if (config.primary_color) {
-        document.getElementById('primaryColor').value = config.primary_color;
-        document.getElementById('primaryColorHex').textContent = config.primary_color;
-    }
-    if (config.secondary_color) {
-        document.getElementById('secondaryColor').value = config.secondary_color;
-        document.getElementById('secondaryColorHex').textContent = config.secondary_color;
-    }
-    if (config.accent_color) {
-        document.getElementById('accentColor').value = config.accent_color;
-        document.getElementById('accentColorHex').textContent = config.accent_color;
-    }
+function renderBusinessCards() {
+    const grid = document.getElementById('businessGrid');
+    const empty = document.getElementById('emptyState');
 
-    // Feature toggles
-    document.getElementById('enableIslamicWill').checked = config.enable_islamic_will !== false;
-    document.getElementById('enableIslamicLpa').checked = config.enable_islamic_lpa !== false;
-    document.getElementById('enableStandardWill').checked = config.enable_standard_will !== false;
-    document.getElementById('enableStandardLpa').checked = config.enable_standard_lpa !== false;
-
-    // Update toggle card visual states
-    updateToggleCard('islamic-will', config.enable_islamic_will !== false);
-    updateToggleCard('islamic-lpa', config.enable_islamic_lpa !== false);
-    updateToggleCard('standard-will', config.enable_standard_will !== false);
-    updateToggleCard('standard-lpa', config.enable_standard_lpa !== false);
-
-    // Contact info
-    if (config.contact_email) document.getElementById('contactEmail').value = config.contact_email;
-    if (config.contact_phone) document.getElementById('contactPhone').value = config.contact_phone;
-    if (config.website_url) document.getElementById('websiteUrl').value = config.website_url;
-    if (config.footer_text) document.getElementById('footerText').value = config.footer_text;
-
-    // Update live preview
-    updatePreview();
-}
-
-// Save config to database
-async function saveConfig() {
-    const configData = {
-        business_name: document.getElementById('businessName').value || 'Will & LPA Generator',
-        business_logo_url: document.getElementById('businessLogoUrl').value || null,
-        primary_color: document.getElementById('primaryColor').value,
-        secondary_color: document.getElementById('secondaryColor').value,
-        accent_color: document.getElementById('accentColor').value,
-        enable_islamic_will: document.getElementById('enableIslamicWill').checked,
-        enable_islamic_lpa: document.getElementById('enableIslamicLpa').checked,
-        enable_standard_will: document.getElementById('enableStandardWill').checked,
-        enable_standard_lpa: document.getElementById('enableStandardLpa').checked,
-        contact_email: document.getElementById('contactEmail').value || null,
-        contact_phone: document.getElementById('contactPhone').value || null,
-        website_url: document.getElementById('websiteUrl').value || null,
-        footer_text: document.getElementById('footerText').value || null
-    };
-
-    if (!supabaseClient) {
-        showStatus('Supabase not connected. Please check your connection and try again.', 'error');
+    if (allBusinesses.length === 0) {
+        grid.innerHTML = '';
+        empty.style.display = '';
         return;
     }
+
+    empty.style.display = 'none';
+    const baseUrl = window.location.origin + window.location.pathname.replace('admin.html', '');
+
+    grid.innerHTML = allBusinesses.map(biz => {
+        const tools = [
+            { key: 'enable_islamic_will', label: 'Islamic Will' },
+            { key: 'enable_islamic_lpa', label: 'Islamic LPA' },
+            { key: 'enable_standard_will', label: 'Standard Will' },
+            { key: 'enable_standard_lpa', label: 'Standard LPA' }
+        ];
+
+        const toolTags = tools.map(t =>
+            `<span class="business-tool-tag${biz[t.key] === false ? ' disabled' : ''}">${t.label}</span>`
+        ).join('');
+
+        const link = `${baseUrl}home.html?b=${biz.id}`;
+
+        return `
+            <div class="business-card">
+                <div class="business-card-header">
+                    <h3 class="business-card-name">${escapeHtml(biz.business_name || 'Untitled')}</h3>
+                    <div class="business-card-actions">
+                        <button onclick="openEditModal('${biz.id}')" title="Edit">Edit</button>
+                        <button class="btn-delete" onclick="deleteBusiness('${biz.id}', '${escapeHtml(biz.business_name || '')}')" title="Delete">Delete</button>
+                    </div>
+                </div>
+                <div class="business-color-dots">
+                    <div class="business-color-dot" style="background:${biz.primary_color || '#1e3a5f'}" title="Primary"></div>
+                    <div class="business-color-dot" style="background:${biz.secondary_color || '#d4af37'}" title="Secondary"></div>
+                    <div class="business-color-dot" style="background:${biz.accent_color || '#1b7340'}" title="Accent"></div>
+                </div>
+                <div class="business-tools">${toolTags}</div>
+                <div class="business-link" onclick="copyLink('${biz.id}')" title="Click to copy link">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+                    ${link}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// ========================================
+// Modal - Add / Edit Business
+// ========================================
+
+function openAddModal() {
+    editingId = null;
+    document.getElementById('modalTitle').textContent = 'Add New Business';
+    document.getElementById('modalSaveBtn').textContent = 'Add Business';
+
+    // Reset form
+    document.getElementById('modalBusinessName').value = '';
+    document.getElementById('modalLogoUrl').value = '';
+    document.getElementById('modalPrimaryColor').value = '#1e3a5f';
+    document.getElementById('modalSecondaryColor').value = '#d4af37';
+    document.getElementById('modalAccentColor').value = '#1b7340';
+    document.getElementById('modalIslamicWill').checked = true;
+    document.getElementById('modalIslamicLpa').checked = true;
+    document.getElementById('modalStandardWill').checked = true;
+    document.getElementById('modalStandardLpa').checked = true;
+    document.getElementById('modalContactEmail').value = '';
+    document.getElementById('modalContactPhone').value = '';
+    document.getElementById('modalWebsiteUrl').value = '';
+    document.getElementById('modalFooterText').value = '';
+
+    document.getElementById('businessModal').classList.add('active');
+}
+
+function openEditModal(id) {
+    const biz = allBusinesses.find(b => b.id === id);
+    if (!biz) return;
+
+    editingId = id;
+    document.getElementById('modalTitle').textContent = 'Edit Business';
+    document.getElementById('modalSaveBtn').textContent = 'Save Changes';
+
+    // Populate form
+    document.getElementById('modalBusinessName').value = biz.business_name || '';
+    document.getElementById('modalLogoUrl').value = biz.business_logo_url || '';
+    document.getElementById('modalPrimaryColor').value = biz.primary_color || '#1e3a5f';
+    document.getElementById('modalSecondaryColor').value = biz.secondary_color || '#d4af37';
+    document.getElementById('modalAccentColor').value = biz.accent_color || '#1b7340';
+    document.getElementById('modalIslamicWill').checked = biz.enable_islamic_will !== false;
+    document.getElementById('modalIslamicLpa').checked = biz.enable_islamic_lpa !== false;
+    document.getElementById('modalStandardWill').checked = biz.enable_standard_will !== false;
+    document.getElementById('modalStandardLpa').checked = biz.enable_standard_lpa !== false;
+    document.getElementById('modalContactEmail').value = biz.contact_email || '';
+    document.getElementById('modalContactPhone').value = biz.contact_phone || '';
+    document.getElementById('modalWebsiteUrl').value = biz.website_url || '';
+    document.getElementById('modalFooterText').value = biz.footer_text || '';
+
+    document.getElementById('businessModal').classList.add('active');
+}
+
+function closeModal() {
+    document.getElementById('businessModal').classList.remove('active');
+    editingId = null;
+}
+
+// ========================================
+// Save Business (Add or Update)
+// ========================================
+
+async function saveBusiness() {
+    const name = document.getElementById('modalBusinessName').value.trim();
+    if (!name) {
+        alert('Please enter a business name.');
+        return;
+    }
+
+    const configData = {
+        business_name: name,
+        business_logo_url: document.getElementById('modalLogoUrl').value.trim() || null,
+        primary_color: document.getElementById('modalPrimaryColor').value,
+        secondary_color: document.getElementById('modalSecondaryColor').value,
+        accent_color: document.getElementById('modalAccentColor').value,
+        enable_islamic_will: document.getElementById('modalIslamicWill').checked,
+        enable_islamic_lpa: document.getElementById('modalIslamicLpa').checked,
+        enable_standard_will: document.getElementById('modalStandardWill').checked,
+        enable_standard_lpa: document.getElementById('modalStandardLpa').checked,
+        contact_email: document.getElementById('modalContactEmail').value.trim() || null,
+        contact_phone: document.getElementById('modalContactPhone').value.trim() || null,
+        website_url: document.getElementById('modalWebsiteUrl').value.trim() || null,
+        footer_text: document.getElementById('modalFooterText').value.trim() || null
+    };
 
     try {
         let result;
-        if (configId) {
-            // Update existing row
+        if (editingId) {
             result = await supabaseClient
                 .from('business_config')
                 .update(configData)
-                .eq('id', configId)
+                .eq('id', editingId)
                 .select();
         } else {
-            // Insert new row linked to current user
-            if (currentUser) {
-                configData.user_id = currentUser.id;
-            }
+            // New business — link to admin user
+            configData.user_id = currentUser ? currentUser.id : null;
             result = await supabaseClient
                 .from('business_config')
                 .insert(configData)
                 .select();
         }
 
-        if (result.error) {
-            throw result.error;
-        }
+        if (result.error) throw result.error;
 
-        if (result.data && result.data[0]) {
-            configId = result.data[0].id;
-        }
-
-        showStatus('Configuration saved successfully! Changes will apply across all pages.', 'success');
+        closeModal();
+        showStatus(editingId ? 'Business updated successfully!' : 'Business added successfully!', 'success');
+        await loadBusinesses();
     } catch (e) {
         console.error('Save error:', e);
-        showStatus('Error saving configuration: ' + e.message, 'error');
+        showStatus('Error saving: ' + e.message, 'error');
     }
 }
 
-// Show status message
+// ========================================
+// Delete Business
+// ========================================
+
+async function deleteBusiness(id, name) {
+    if (!confirm(`Are you sure you want to delete "${name}"?\n\nThis cannot be undone.`)) return;
+
+    try {
+        const { error } = await supabaseClient
+            .from('business_config')
+            .delete()
+            .eq('id', id);
+
+        if (error) throw error;
+
+        showStatus(`"${name}" deleted.`, 'success');
+        await loadBusinesses();
+    } catch (e) {
+        showStatus('Error deleting: ' + e.message, 'error');
+    }
+}
+
+// ========================================
+// Copy Link
+// ========================================
+
+function copyLink(id) {
+    const baseUrl = window.location.origin + window.location.pathname.replace('admin.html', '');
+    const link = `${baseUrl}home.html?b=${id}`;
+
+    navigator.clipboard.writeText(link).then(() => {
+        showStatus('Link copied to clipboard!', 'success');
+    }).catch(() => {
+        // Fallback
+        prompt('Copy this link:', link);
+    });
+}
+
+// ========================================
+// Logo Upload
+// ========================================
+
+async function handleLogoUpload(input) {
+    const file = input.files[0];
+    if (!file) return;
+
+    const statusEl = document.getElementById('logoUploadStatus');
+    statusEl.style.display = 'block';
+    statusEl.style.color = '#64748b';
+    statusEl.textContent = 'Uploading...';
+
+    try {
+        // Create unique filename
+        const ext = file.name.split('.').pop();
+        const fileName = `logos/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+
+        const { data, error } = await supabaseClient.storage
+            .from('business-assets')
+            .upload(fileName, file, { cacheControl: '3600', upsert: false });
+
+        if (error) throw error;
+
+        // Get public URL
+        const { data: urlData } = supabaseClient.storage
+            .from('business-assets')
+            .getPublicUrl(fileName);
+
+        const publicUrl = urlData.publicUrl;
+        document.getElementById('modalLogoUrl').value = publicUrl;
+
+        // Show preview
+        const preview = document.getElementById('logoPreviewAdmin');
+        document.getElementById('logoPreviewImg').src = publicUrl;
+        preview.style.display = '';
+
+        statusEl.style.color = '#065f46';
+        statusEl.textContent = 'Uploaded successfully!';
+        setTimeout(() => { statusEl.style.display = 'none'; }, 3000);
+    } catch (e) {
+        console.error('Upload error:', e);
+        statusEl.style.color = '#991b1b';
+        statusEl.textContent = 'Upload failed: ' + e.message;
+    }
+
+    // Reset file input
+    input.value = '';
+}
+
+// ========================================
+// Utility Functions
+// ========================================
+
 function showStatus(message, type) {
     const el = document.getElementById('statusMessage');
     el.style.display = 'block';
     el.textContent = message;
 
     if (type === 'success') {
-        el.style.background = '#d1fae5';
-        el.style.color = '#065f46';
-        el.style.border = '1px solid #a7f3d0';
+        el.style.background = '#d1fae5'; el.style.color = '#065f46'; el.style.border = '1px solid #a7f3d0';
     } else if (type === 'error') {
-        el.style.background = '#fee2e2';
-        el.style.color = '#991b1b';
-        el.style.border = '1px solid #fecaca';
-    } else if (type === 'warning') {
-        el.style.background = '#fef3c7';
-        el.style.color = '#92400e';
-        el.style.border = '1px solid #fde68a';
+        el.style.background = '#fee2e2'; el.style.color = '#991b1b'; el.style.border = '1px solid #fecaca';
     }
 
-    // Auto-hide after 5 seconds
-    setTimeout(() => {
-        el.style.display = 'none';
-    }, 5000);
+    setTimeout(() => { el.style.display = 'none'; }, 4000);
 }
 
-// Update toggle card visual state
-function updateToggleCard(name, enabled) {
-    const card = document.getElementById('toggleCard-' + name);
-    if (card) {
-        if (enabled) {
-            card.classList.add('enabled');
-        } else {
-            card.classList.remove('enabled');
-        }
-    }
+function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
 }
 
-// Update logo preview
-function updateLogoPreview(url) {
-    const preview = document.getElementById('logoPreview');
-    if (url && url.trim()) {
-        preview.innerHTML = `<img src="${url}" alt="Logo" style="max-width:100%;max-height:100%;object-fit:contain;" onerror="this.parentElement.innerHTML='<svg width=20 height=20 viewBox=&quot;0 0 24 24&quot; fill=none stroke=#ccc stroke-width=2><rect x=3 y=3 width=18 height=18 rx=2 ry=2></rect><circle cx=8.5 cy=8.5 r=1.5></circle><polyline points=&quot;21 15 16 10 5 21&quot;></polyline></svg>'">`;
-    } else {
-        preview.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>';
-    }
-}
+// ========================================
+// Init
+// ========================================
 
-// Update live preview
-function updatePreview() {
-    const name = document.getElementById('businessName').value || 'Will & LPA Generator';
-    const primaryColor = document.getElementById('primaryColor').value;
-    const accentColor = document.getElementById('accentColor').value;
-    const secondaryColor = document.getElementById('secondaryColor').value;
-    const logoUrl = document.getElementById('businessLogoUrl').value;
-
-    // Update preview header
-    const previewHeader = document.getElementById('previewHeader');
-    previewHeader.style.background = primaryColor;
-    document.getElementById('previewName').textContent = name;
-
-    // Update preview logo
-    const previewLogoIcon = document.getElementById('previewLogoIcon');
-    if (logoUrl && logoUrl.trim()) {
-        previewLogoIcon.innerHTML = `<img src="${logoUrl}" alt="Logo" style="height:24px;width:auto;" onerror="this.textContent='&#9878;'">`;
-    } else {
-        previewLogoIcon.textContent = '\u2696';
-    }
-
-    // Update preview button
-    const previewButton = document.getElementById('previewButton');
-    previewButton.style.background = accentColor;
-
-    // Update secondary preview
-    const previewSecondary = document.getElementById('previewSecondary');
-    previewSecondary.style.color = secondaryColor;
-    previewSecondary.style.borderColor = secondaryColor;
-}
-
-// Event listeners
 document.addEventListener('DOMContentLoaded', async function() {
     initSupabase();
     const isLoggedIn = await checkAuth();
     if (isLoggedIn) {
-        loadConfig();
+        loadBusinesses();
     }
+});
 
-    // Color picker change events
-    document.getElementById('primaryColor').addEventListener('input', function() {
-        document.getElementById('primaryColorHex').textContent = this.value;
-        updatePreview();
-    });
-
-    document.getElementById('secondaryColor').addEventListener('input', function() {
-        document.getElementById('secondaryColorHex').textContent = this.value;
-        updatePreview();
-    });
-
-    document.getElementById('accentColor').addEventListener('input', function() {
-        document.getElementById('accentColorHex').textContent = this.value;
-        updatePreview();
-    });
-
-    // Business name change
-    document.getElementById('businessName').addEventListener('input', updatePreview);
-
-    // Logo URL change
-    document.getElementById('businessLogoUrl').addEventListener('input', function() {
-        updateLogoPreview(this.value);
-        updatePreview();
-    });
+// Close modal on outside click
+document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('modal-overlay')) {
+        closeModal();
+    }
 });
