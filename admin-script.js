@@ -7,6 +7,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
 let supabaseClient = null;
 let configId = null; // ID of existing config row (for updates)
+let currentUser = null; // Logged-in user
 
 function initSupabase() {
     try {
@@ -30,7 +31,9 @@ async function checkAuth() {
     try {
         const { data: { session } } = await supabaseClient.auth.getSession();
         if (session) {
+            currentUser = session.user;
             showAdminPanel();
+            showLoggedInUser();
             return true;
         }
     } catch (e) {
@@ -65,7 +68,9 @@ async function adminLogin() {
             return;
         }
         if (data.session) {
+            currentUser = data.session.user;
             showAdminPanel();
+            showLoggedInUser();
             loadConfig();
         }
     } catch (e) {
@@ -78,6 +83,8 @@ async function adminLogout() {
     if (supabaseClient) {
         await supabaseClient.auth.signOut();
     }
+    currentUser = null;
+    configId = null;
     document.getElementById('loginScreen').style.display = '';
     document.getElementById('adminPanel').style.display = 'none';
     document.getElementById('saveBar').style.display = 'none';
@@ -88,6 +95,13 @@ function showAdminPanel() {
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('adminPanel').style.display = '';
     document.getElementById('saveBar').style.display = '';
+}
+
+function showLoggedInUser() {
+    const el = document.getElementById('loggedInUser');
+    if (el && currentUser) {
+        el.textContent = currentUser.email;
+    }
 }
 
 // Allow Enter key to submit login
@@ -105,11 +119,16 @@ async function loadConfig() {
     }
 
     try {
-        const { data, error } = await supabaseClient
+        // Load config for the logged-in user
+        let query = supabaseClient
             .from('business_config')
-            .select('*')
-            .limit(1)
-            .single();
+            .select('*');
+
+        if (currentUser) {
+            query = query.eq('user_id', currentUser.id);
+        }
+
+        const { data, error } = await query.limit(1).single();
 
         if (data && !error) {
             configId = data.id;
@@ -197,7 +216,10 @@ async function saveConfig() {
                 .eq('id', configId)
                 .select();
         } else {
-            // Insert new row
+            // Insert new row linked to current user
+            if (currentUser) {
+                configData.user_id = currentUser.id;
+            }
             result = await supabaseClient
                 .from('business_config')
                 .insert(configData)

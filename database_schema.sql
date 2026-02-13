@@ -653,6 +653,7 @@ DROP TABLE IF EXISTS business_config CASCADE;
 
 CREATE TABLE business_config (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID REFERENCES auth.users(id),
 
     -- Branding
     business_name TEXT DEFAULT 'Will & LPA Generator',
