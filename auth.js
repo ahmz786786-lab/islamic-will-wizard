@@ -131,6 +131,21 @@ async function requireAuth() {
         }
         return false;
     }
+
+    // Check subscription status — block inactive/cancelled users
+    if (currentProfile && (currentProfile.subscription_status === 'inactive' || currentProfile.subscription_status === 'cancelled')) {
+        document.body.innerHTML =
+            '<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:Inter,sans-serif;background:#f8fafc;">' +
+                '<div style="text-align:center;padding:2rem;background:white;border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,0.08);max-width:420px;">' +
+                    '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="1.5" style="margin-bottom:1rem;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>' +
+                    '<h2 style="margin:0 0 0.5rem;color:#1e293b;">Subscription Required</h2>' +
+                    '<p style="color:#64748b;margin:0 0 1.5rem;">Your account is not currently active. Please contact us to activate your subscription.</p>' +
+                    '<a href="index.html" style="display:inline-block;padding:0.75rem 2rem;background:#1e3a5f;color:white;border-radius:8px;text-decoration:none;font-weight:500;">Go to Home</a>' +
+                '</div>' +
+            '</div>';
+        return false;
+    }
+
     return true;
 }
 

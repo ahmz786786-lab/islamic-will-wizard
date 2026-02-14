@@ -166,6 +166,35 @@
         .mini-toggle input:checked + .slider { background: #1e3a5f; }
         .mini-toggle input:checked + .slider:before { transform: translateX(18px); }
 
+        .dash-tab.active { color: #1e3a5f !important; border-bottom-color: #1e3a5f !important; }
+        .dash-tab:hover { color: #1e3a5f; }
+
+        .user-card {
+            background: white; border-radius: 12px; border: 1px solid #e5e7eb;
+            padding: 1.25rem; transition: box-shadow 0.2s;
+        }
+        .user-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+        .user-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; }
+        .user-card-name { font-size: 1rem; font-weight: 600; color: #1e293b; margin: 0; }
+        .user-card-email { font-size: 0.8rem; color: #64748b; margin: 0.2rem 0 0; }
+        .user-card-meta { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
+        .user-badge {
+            font-size: 0.7rem; padding: 0.2rem 0.5rem; border-radius: 4px;
+            font-weight: 600; text-transform: uppercase;
+        }
+        .user-badge.role-client { background: #dbeafe; color: #1e40af; }
+        .user-badge.role-solicitor { background: #fef3c7; color: #92400e; }
+        .user-badge.role-admin { background: #fce7f3; color: #9d174d; }
+        .user-badge.status-active { background: #d1fae5; color: #065f46; }
+        .user-badge.status-inactive { background: #fee2e2; color: #991b1b; }
+        .user-badge.status-trial { background: #e0e7ff; color: #3730a3; }
+        .user-badge.status-cancelled { background: #f3f4f6; color: #6b7280; }
+        .user-card-actions { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+        .user-card-actions select {
+            padding: 0.35rem 0.5rem; border: 1px solid #e5e7eb; border-radius: 6px;
+            font-size: 0.8rem; font-family: inherit; cursor: pointer; background: white;
+        }
+
         @media (max-width: 640px) {
             .business-grid { grid-template-columns: 1fr; }
             .modal-toggle-grid { grid-template-columns: 1fr; }
@@ -234,6 +263,14 @@
                 </button>
             </div>
 
+            <!-- Tab Navigation -->
+            <div style="display:flex;gap:0;border-bottom:2px solid #e5e7eb;margin-bottom:1.5rem;">
+                <button class="dash-tab active" onclick="switchDashTab('businesses')" id="tabBusinesses" style="flex:1;padding:0.75rem;background:none;border:none;font-size:1rem;font-weight:600;color:#94a3b8;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;font-family:inherit;">Businesses</button>
+                <button class="dash-tab" onclick="switchDashTab('users')" id="tabUsers" style="flex:1;padding:0.75rem;background:none;border:none;font-size:1rem;font-weight:600;color:#94a3b8;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;font-family:inherit;">Users</button>
+            </div>
+
+            <!-- BUSINESSES TAB -->
+            <div id="businessesTab">
             <!-- Business cards -->
             <div id="businessGrid" class="business-grid"></div>
 
@@ -242,6 +279,21 @@
                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
                 <h3>No businesses yet</h3>
                 <p>Click "Add Business" to set up your first client.</p>
+            </div>
+            </div><!-- end businessesTab -->
+
+            <!-- USERS TAB -->
+            <div id="usersTab" style="display:none;">
+                <div class="dash-toolbar">
+                    <h2>All Users</h2>
+                    <span id="userCount" style="color:#64748b;font-size:0.9rem;"></span>
+                </div>
+                <div id="usersGrid" class="business-grid"></div>
+                <div id="usersEmpty" class="empty-state" style="display:none;">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    <h3>No users found</h3>
+                    <p>Users will appear here after they sign up.</p>
+                </div>
             </div>
         </div>
     </div>

@@ -409,12 +409,137 @@ function escapeHtml(str) {
 }
 
 // ========================================
+// Tab Switching
+// ========================================
+
+function switchDashTab(tab) {
+    document.getElementById('businessesTab').style.display = tab === 'businesses' ? '' : 'none';
+    document.getElementById('usersTab').style.display = tab === 'users' ? '' : 'none';
+
+    document.getElementById('tabBusinesses').classList.toggle('active', tab === 'businesses');
+    document.getElementById('tabUsers').classList.toggle('active', tab === 'users');
+
+    // Hide add business button when on users tab
+    var addBtn = document.querySelector('.dash-toolbar .btn-add');
+    if (addBtn) addBtn.style.display = tab === 'businesses' ? '' : 'none';
+
+    if (tab === 'users') {
+        loadUsers();
+    }
+}
+
+// ========================================
+// User Management
+// ========================================
+
+var allUsers = [];
+
+async function loadUsers() {
+    if (!supabaseClient) return;
+
+    try {
+        var { data, error } = await supabaseClient
+            .from('user_profiles')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (data && !error) {
+            allUsers = data;
+        } else {
+            allUsers = [];
+        }
+    } catch (e) {
+        console.log('Load users error:', e.message);
+        allUsers = [];
+    }
+
+    renderUserCards();
+}
+
+function renderUserCards() {
+    var grid = document.getElementById('usersGrid');
+    var empty = document.getElementById('usersEmpty');
+    var countEl = document.getElementById('userCount');
+
+    countEl.textContent = allUsers.length + ' user' + (allUsers.length !== 1 ? 's' : '');
+
+    if (allUsers.length === 0) {
+        grid.innerHTML = '';
+        empty.style.display = '';
+        return;
+    }
+
+    empty.style.display = 'none';
+
+    grid.innerHTML = allUsers.map(function(user) {
+        var created = user.created_at ? new Date(user.created_at).toLocaleDateString('en-GB') : 'N/A';
+
+        return '<div class="user-card">' +
+            '<div class="user-card-header">' +
+                '<div>' +
+                    '<h3 class="user-card-name">' + escapeHtml(user.full_name || 'No Name') + '</h3>' +
+                    '<p class="user-card-email">' + escapeHtml(user.email || '') + '</p>' +
+                '</div>' +
+            '</div>' +
+            '<div class="user-card-meta">' +
+                '<span class="user-badge role-' + user.role + '">' + user.role + '</span>' +
+                '<span class="user-badge status-' + user.subscription_status + '">' + user.subscription_status + '</span>' +
+                '<span style="font-size:0.75rem;color:#94a3b8;">Joined ' + created + '</span>' +
+            '</div>' +
+            '<div class="user-card-actions">' +
+                '<select onchange="updateUserRole(\'' + user.id + '\', this.value)">' +
+                    '<option value="client"' + (user.role === 'client' ? ' selected' : '') + '>Client</option>' +
+                    '<option value="solicitor"' + (user.role === 'solicitor' ? ' selected' : '') + '>Solicitor</option>' +
+                    '<option value="admin"' + (user.role === 'admin' ? ' selected' : '') + '>Admin</option>' +
+                '</select>' +
+                '<select onchange="updateUserStatus(\'' + user.id + '\', this.value)">' +
+                    '<option value="active"' + (user.subscription_status === 'active' ? ' selected' : '') + '>Active</option>' +
+                    '<option value="trial"' + (user.subscription_status === 'trial' ? ' selected' : '') + '>Trial</option>' +
+                    '<option value="inactive"' + (user.subscription_status === 'inactive' ? ' selected' : '') + '>Inactive</option>' +
+                    '<option value="cancelled"' + (user.subscription_status === 'cancelled' ? ' selected' : '') + '>Cancelled</option>' +
+                '</select>' +
+            '</div>' +
+        '</div>';
+    }).join('');
+}
+
+async function updateUserRole(userId, newRole) {
+    try {
+        var { error } = await supabaseClient
+            .from('user_profiles')
+            .update({ role: newRole })
+            .eq('id', userId);
+
+        if (error) throw error;
+        showStatus('Role updated to ' + newRole, 'success');
+        loadUsers();
+    } catch (e) {
+        showStatus('Error updating role: ' + e.message, 'error');
+    }
+}
+
+async function updateUserStatus(userId, newStatus) {
+    try {
+        var { error } = await supabaseClient
+            .from('user_profiles')
+            .update({ subscription_status: newStatus })
+            .eq('id', userId);
+
+        if (error) throw error;
+        showStatus('Subscription updated to ' + newStatus, 'success');
+        loadUsers();
+    } catch (e) {
+        showStatus('Error updating status: ' + e.message, 'error');
+    }
+}
+
+// ========================================
 // Init
 // ========================================
 
 document.addEventListener('DOMContentLoaded', async function() {
     initSupabase();
-    const isLoggedIn = await checkAuth();
+    var isLoggedIn = await checkAuth();
     if (isLoggedIn) {
         loadBusinesses();
     }
