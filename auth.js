@@ -132,6 +132,18 @@ async function requireAuth() {
         return false;
     }
 
+    // Check if trial has expired — auto-downgrade to inactive
+    if (currentProfile && currentProfile.subscription_status === 'trial') {
+        if (currentProfile.trial_ends_at && new Date(currentProfile.trial_ends_at) < new Date()) {
+            // Trial expired — update in DB and block
+            const sb = getAuthSupabase();
+            if (sb) {
+                await sb.from('user_profiles').update({ subscription_status: 'inactive' }).eq('id', currentUser.id);
+                currentProfile.subscription_status = 'inactive';
+            }
+        }
+    }
+
     // Check subscription status — block inactive/cancelled users
     if (currentProfile && (currentProfile.subscription_status === 'inactive' || currentProfile.subscription_status === 'cancelled')) {
         document.body.innerHTML =

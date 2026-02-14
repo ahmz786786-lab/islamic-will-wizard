@@ -119,6 +119,22 @@
 
     <!-- App Section (shown when logged in) -->
     <div id="appSection" style="display:none;">
+        <!-- Trial Banner -->
+        <div id="trialBanner" style="display:none;">
+            <div class="home-container">
+                <div style="background:linear-gradient(135deg,#fef3c7,#fde68a);border:1px solid #f59e0b;border-radius:12px;padding:1rem 1.5rem;margin-top:1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
+                    <div style="display:flex;align-items:center;gap:0.75rem;">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        <div>
+                            <strong style="color:#92400e;" id="trialTitle">Free Trial</strong>
+                            <p style="margin:0;color:#a16207;font-size:0.85rem;" id="trialMessage">You have X days remaining on your trial.</p>
+                        </div>
+                    </div>
+                    <span style="background:#f59e0b;color:white;padding:0.35rem 1rem;border-radius:20px;font-size:0.8rem;font-weight:600;" id="trialBadge">Trial</span>
+                </div>
+            </div>
+        </div>
+
         <!-- Hero Section -->
         <div class="home-container">
             <div class="home-hero">
@@ -245,6 +261,18 @@
             const session = await checkAuthSession();
 
             if (session) {
+                // Check trial expiry
+                if (currentProfile && currentProfile.subscription_status === 'trial') {
+                    if (currentProfile.trial_ends_at && new Date(currentProfile.trial_ends_at) < new Date()) {
+                        // Trial expired — auto-downgrade
+                        const sb = getAuthSupabase();
+                        if (sb) {
+                            await sb.from('user_profiles').update({ subscription_status: 'inactive' }).eq('id', currentUser.id);
+                            currentProfile.subscription_status = 'inactive';
+                        }
+                    }
+                }
+
                 // Check if user is inactive/cancelled — show pending screen
                 if (currentProfile && (currentProfile.subscription_status === 'inactive' || currentProfile.subscription_status === 'cancelled')) {
                     showPending();
@@ -321,6 +349,23 @@
                     el.style.display = (isAdmin || navPlanMap[navId].includes(userPlan)) ? '' : 'none';
                 }
             });
+
+            // Show trial banner with days remaining
+            if (currentProfile && currentProfile.subscription_status === 'trial' && currentProfile.trial_ends_at) {
+                const now = new Date();
+                const trialEnd = new Date(currentProfile.trial_ends_at);
+                const msLeft = trialEnd - now;
+                const daysLeft = Math.ceil(msLeft / (1000 * 60 * 60 * 24));
+
+                if (daysLeft > 0) {
+                    document.getElementById('trialBanner').style.display = 'block';
+                    document.getElementById('trialMessage').textContent =
+                        daysLeft === 1
+                            ? 'Your trial expires tomorrow. Contact us to continue access.'
+                            : 'You have ' + daysLeft + ' days remaining on your free trial.';
+                    document.getElementById('trialBadge').textContent = daysLeft + ' day' + (daysLeft !== 1 ? 's' : '') + ' left';
+                }
+            }
 
             // Show role-specific sections
             if (currentProfile) {
@@ -402,6 +447,17 @@
                 btn.disabled = false;
                 btn.innerHTML = '<span>Login</span>';
                 return;
+            }
+
+            // Check trial expiry on login
+            if (currentProfile && currentProfile.subscription_status === 'trial') {
+                if (currentProfile.trial_ends_at && new Date(currentProfile.trial_ends_at) < new Date()) {
+                    const sb = getAuthSupabase();
+                    if (sb) {
+                        await sb.from('user_profiles').update({ subscription_status: 'inactive' }).eq('id', currentUser.id);
+                        currentProfile.subscription_status = 'inactive';
+                    }
+                }
             }
 
             // Check if user is inactive/cancelled — show pending screen

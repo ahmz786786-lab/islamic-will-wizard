@@ -745,8 +745,9 @@ CREATE TABLE user_profiles (
     full_name TEXT NOT NULL,
     email TEXT NOT NULL,
     role TEXT NOT NULL DEFAULT 'client' CHECK (role IN ('client', 'solicitor', 'admin')),
-    subscription_status TEXT NOT NULL DEFAULT 'inactive' CHECK (subscription_status IN ('active', 'inactive', 'trial', 'cancelled')),
-    plan TEXT NOT NULL DEFAULT 'none' CHECK (plan IN ('none', 'islamic', 'standard', 'all')),
+    subscription_status TEXT NOT NULL DEFAULT 'trial' CHECK (subscription_status IN ('active', 'inactive', 'trial', 'cancelled')),
+    plan TEXT NOT NULL DEFAULT 'all' CHECK (plan IN ('none', 'islamic', 'standard', 'all')),
+    trial_ends_at TIMESTAMPTZ,
     business_id UUID REFERENCES business_config(id),
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -766,12 +767,15 @@ CREATE TRIGGER update_user_profiles_timestamp
 CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-    INSERT INTO public.user_profiles (id, full_name, email, role)
+    INSERT INTO public.user_profiles (id, full_name, email, role, subscription_status, plan, trial_ends_at)
     VALUES (
         NEW.id,
         COALESCE(NEW.raw_user_meta_data->>'full_name', ''),
         COALESCE(NEW.email, ''),
-        COALESCE(NEW.raw_user_meta_data->>'role', 'client')
+        COALESCE(NEW.raw_user_meta_data->>'role', 'client'),
+        'trial',
+        'all',
+        NOW() + INTERVAL '3 days'
     );
     RETURN NEW;
 END;
