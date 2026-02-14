@@ -36,7 +36,14 @@ let nonHeirCount = 0;
 let adoptedCount = 0;
 
 // Initialize
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    // Auth gate - redirect to home if not logged in
+    const isAuthed = await requireAuth();
+    if (!isAuthed) return;
+
+    // Render user header in nav
+    renderUserHeader();
+
     console.log('DOM loaded, initializing...');
     initSupabase();
     initProgressSteps();
@@ -785,6 +792,9 @@ async function saveWillToDatabase(status = 'draft') {
 
     try {
         const willRecord = {
+            // User ownership
+            user_id: getCurrentUserId(),
+
             // Testator Personal Info
             testator_title: formData.testatorTitle || '',
             testator_name: formData.fullName || '',
@@ -1071,9 +1081,16 @@ async function loadSavedWills() {
     // Try to load from Supabase
     if (supabaseClient) {
         try {
-            const { data, error } = await supabaseClient
+            let query = supabaseClient
                 .from('islamic_wills')
-                .select('id, testator_title, testator_name, testator_email, will_type, status, created_at, reference_number')
+                .select('id, testator_title, testator_name, testator_email, will_type, status, created_at, reference_number');
+
+            const currentUid = getCurrentUserId();
+            if (currentUid) {
+                query = query.eq('user_id', currentUid);
+            }
+
+            const { data, error } = await query
                 .order('created_at', { ascending: false })
                 .limit(20);
 

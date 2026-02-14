@@ -735,5 +735,118 @@ ALTER TABLE islamic_wills ADD COLUMN IF NOT EXISTS testator_title TEXT;
 ALTER TABLE standard_wills ADD COLUMN IF NOT EXISTS testator_title TEXT;
 
 -- =============================================
+-- USER PROFILES TABLE (Authentication)
+-- =============================================
+DROP TABLE IF EXISTS solicitor_clients CASCADE;
+DROP TABLE IF EXISTS user_profiles CASCADE;
+
+CREATE TABLE user_profiles (
+    id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+    full_name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    role TEXT NOT NULL DEFAULT 'client' CHECK (role IN ('client', 'solicitor', 'admin')),
+    subscription_status TEXT NOT NULL DEFAULT 'active' CHECK (subscription_status IN ('active', 'inactive', 'trial', 'cancelled')),
+    business_id UUID REFERENCES business_config(id),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_user_profiles_email ON user_profiles(email);
+CREATE INDEX idx_user_profiles_role ON user_profiles(role);
+CREATE INDEX idx_user_profiles_business ON user_profiles(business_id);
+
+DROP TRIGGER IF EXISTS update_user_profiles_timestamp ON user_profiles;
+CREATE TRIGGER update_user_profiles_timestamp
+    BEFORE UPDATE ON user_profiles
+    FOR EACH ROW
+    EXECUTE FUNCTION update_timestamp();
+
+-- Auto-create profile when a new user signs up
+CREATE OR REPLACE FUNCTION handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+    INSERT INTO public.user_profiles (id, full_name, email, role)
+    VALUES (
+        NEW.id,
+        COALESCE(NEW.raw_user_meta_data->>'full_name', ''),
+        COALESCE(NEW.email, ''),
+        COALESCE(NEW.raw_user_meta_data->>'role', 'client')
+    );
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+    AFTER INSERT ON auth.users
+    FOR EACH ROW
+    EXECUTE FUNCTION handle_new_user();
+
+-- =============================================
+-- SOLICITOR CLIENTS TABLE
+-- =============================================
+CREATE TABLE solicitor_clients (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    solicitor_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    client_name TEXT NOT NULL,
+    client_email TEXT,
+    client_phone TEXT,
+    notes TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE INDEX idx_solicitor_clients_solicitor ON solicitor_clients(solicitor_id);
+
+DROP TRIGGER IF EXISTS update_solicitor_clients_timestamp ON solicitor_clients;
+CREATE TRIGGER update_solicitor_clients_timestamp
+    BEFORE UPDATE ON solicitor_clients
+    FOR EACH ROW
+    EXECUTE FUNCTION update_timestamp();
+
+-- =============================================
+-- MIGRATION: Add user_id to document tables
+-- =============================================
+ALTER TABLE islamic_wills ADD COLUMN IF NOT EXISTS user_id UUID REFERENCES auth.users(id);
+ALTER TABLE standard_wills ADD COLUMN IF NOT EXISTS user_id UUID REFERENCES auth.users(id);
+ALTER TABLE islamic_lpas ADD COLUMN IF NOT EXISTS user_id UUID REFERENCES auth.users(id);
+ALTER TABLE standard_lpas ADD COLUMN IF NOT EXISTS user_id UUID REFERENCES auth.users(id);
+
+CREATE INDEX IF NOT EXISTS idx_islamic_wills_user ON islamic_wills(user_id);
+CREATE INDEX IF NOT EXISTS idx_standard_wills_user ON standard_wills(user_id);
+CREATE INDEX IF NOT EXISTS idx_islamic_lpas_user ON islamic_lpas(user_id);
+CREATE INDEX IF NOT EXISTS idx_standard_lpas_user ON standard_lpas(user_id);
+
+-- =============================================
+-- ROW LEVEL SECURITY POLICIES
+-- =============================================
+
+-- User Profiles: users can read/update their own profile
+ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users can view own profile" ON user_profiles FOR SELECT USING (auth.uid() = id);
+CREATE POLICY "Users can update own profile" ON user_profiles FOR UPDATE USING (auth.uid() = id);
+
+-- Solicitor Clients: solicitors can manage their own clients
+ALTER TABLE solicitor_clients ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Solicitors can manage own clients" ON solicitor_clients FOR ALL USING (auth.uid() = solicitor_id);
+
+-- Document tables: users can only see their own documents
+ALTER TABLE islamic_wills ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users can manage own islamic wills" ON islamic_wills FOR ALL USING (auth.uid() = user_id);
+CREATE POLICY "Allow insert with user_id" ON islamic_wills FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+ALTER TABLE standard_wills ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users can manage own standard wills" ON standard_wills FOR ALL USING (auth.uid() = user_id);
+CREATE POLICY "Allow insert std wills" ON standard_wills FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+ALTER TABLE islamic_lpas ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users can manage own islamic lpas" ON islamic_lpas FOR ALL USING (auth.uid() = user_id);
+CREATE POLICY "Allow insert islamic lpas" ON islamic_lpas FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+ALTER TABLE standard_lpas ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users can manage own standard lpas" ON standard_lpas FOR ALL USING (auth.uid() = user_id);
+CREATE POLICY "Allow insert std lpas" ON standard_lpas FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+-- =============================================
 -- DONE! Your database is ready.
 -- =============================================

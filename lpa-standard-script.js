@@ -30,7 +30,14 @@ let replacementAttorneyCount = 0;
 let notifyPersonCount = 0;
 
 // Initialize
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    // Auth gate - redirect to home if not logged in
+    const isAuthed = await requireAuth();
+    if (!isAuthed) return;
+
+    // Render user header in nav
+    renderUserHeader();
+
     console.log('Standard LPA DOM loaded, initializing...');
     initSupabase();
     initProgressSteps();
@@ -520,6 +527,7 @@ async function saveStandardLpaToDatabase(status = 'draft') {
 
     try {
         const lpaRecord = {
+            user_id: getCurrentUserId(),
             lpa_type: lpaFormData.lpaType || 'property',
 
             donor_title: lpaFormData.donorTitle || '',
@@ -698,9 +706,16 @@ async function loadSavedLpas() {
 
     if (supabaseClient) {
         try {
-            const { data, error } = await supabaseClient
+            let query = supabaseClient
                 .from('standard_lpas')
-                .select('id, donor_name, donor_email, lpa_type, status, created_at, reference_number')
+                .select('id, donor_name, donor_email, lpa_type, status, created_at, reference_number');
+
+            const uid = getCurrentUserId();
+            if (uid) {
+                query = query.eq('user_id', uid);
+            }
+
+            const { data, error } = await query
                 .order('created_at', { ascending: false })
                 .limit(20);
 

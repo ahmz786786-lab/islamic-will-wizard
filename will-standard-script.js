@@ -37,7 +37,14 @@ let charityCount = 0;
 let beneficiaryCount = 0;
 
 // Initialize
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    // Auth gate - redirect to home if not logged in
+    const isAuthed = await requireAuth();
+    if (!isAuthed) return;
+
+    // Render user header in nav
+    renderUserHeader();
+
     console.log('DOM loaded, initializing Standard Will...');
     initSupabase();
     initProgressSteps();
@@ -833,6 +840,8 @@ async function saveStandardWillToDatabase(status = 'draft') {
 
     try {
         const willRecord = {
+            // User association
+            user_id: getCurrentUserId(),
             // Testator Personal Info
             testator_title: formData.testatorTitle || '',
             testator_name: formData.fullName || '',
@@ -966,9 +975,16 @@ async function loadSavedWills() {
     // Try to load from Supabase
     if (supabaseClient) {
         try {
-            const { data, error } = await supabaseClient
+            let query = supabaseClient
                 .from('standard_wills')
-                .select('id, testator_title, testator_name, testator_email, status, created_at, reference_number')
+                .select('id, testator_title, testator_name, testator_email, status, created_at, reference_number');
+
+            const userId = getCurrentUserId();
+            if (userId) {
+                query = query.eq('user_id', userId);
+            }
+
+            const { data, error } = await query
                 .order('created_at', { ascending: false })
                 .limit(20);
 
