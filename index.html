@@ -285,6 +285,43 @@
             // Render user header
             renderUserHeaderHome();
 
+            // Plan-based tool visibility
+            const userPlan = getCurrentUserPlan();
+            const userRole = currentProfile ? currentProfile.role : 'client';
+            const isAdmin = userRole === 'admin';
+
+            // Card ID → which plans can see it
+            const cardPlanMap = {
+                'card-islamic-will': ['islamic', 'all'],
+                'card-islamic-lpa':  ['islamic', 'all'],
+                'card-standard-will': ['standard', 'all'],
+                'card-standard-lpa':  ['standard', 'all']
+            };
+
+            // Nav link ID → which plans can see it
+            const navPlanMap = {
+                'nav-islamic-will': ['islamic', 'all'],
+                'nav-islamic-lpa':  ['islamic', 'all'],
+                'nav-standard-will': ['standard', 'all'],
+                'nav-standard-lpa':  ['standard', 'all']
+            };
+
+            // Show/hide tool cards based on plan (admins see all)
+            Object.keys(cardPlanMap).forEach(function(cardId) {
+                const el = document.getElementById(cardId);
+                if (el) {
+                    el.style.display = (isAdmin || cardPlanMap[cardId].includes(userPlan)) ? '' : 'none';
+                }
+            });
+
+            // Show/hide nav links based on plan (admins see all)
+            Object.keys(navPlanMap).forEach(function(navId) {
+                const el = document.getElementById(navId);
+                if (el) {
+                    el.style.display = (isAdmin || navPlanMap[navId].includes(userPlan)) ? '' : 'none';
+                }
+            });
+
             // Show role-specific sections
             if (currentProfile) {
                 if (currentProfile.role === 'solicitor') {
@@ -364,6 +401,12 @@
                 errorEl.style.display = 'block';
                 btn.disabled = false;
                 btn.innerHTML = '<span>Login</span>';
+                return;
+            }
+
+            // Check if user is inactive/cancelled — show pending screen
+            if (currentProfile && (currentProfile.subscription_status === 'inactive' || currentProfile.subscription_status === 'cancelled')) {
+                showPending();
                 return;
             }
 

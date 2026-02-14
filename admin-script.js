@@ -484,52 +484,49 @@ function renderUserCards() {
             '<div class="user-card-meta">' +
                 '<span class="user-badge role-' + user.role + '">' + user.role + '</span>' +
                 '<span class="user-badge status-' + user.subscription_status + '">' + user.subscription_status + '</span>' +
+                '<span class="user-badge" style="background:#f0f4f8;color:#475569;">' + (user.plan || 'none') + ' plan</span>' +
                 '<span style="font-size:0.75rem;color:#94a3b8;">Joined ' + created + '</span>' +
             '</div>' +
             '<div class="user-card-actions">' +
-                '<select onchange="updateUserRole(\'' + user.id + '\', this.value)">' +
+                '<select onchange="updateUserField(\'' + user.id + '\', \'role\', this.value)" title="Role">' +
                     '<option value="client"' + (user.role === 'client' ? ' selected' : '') + '>Client</option>' +
                     '<option value="solicitor"' + (user.role === 'solicitor' ? ' selected' : '') + '>Solicitor</option>' +
                     '<option value="admin"' + (user.role === 'admin' ? ' selected' : '') + '>Admin</option>' +
                 '</select>' +
-                '<select onchange="updateUserStatus(\'' + user.id + '\', this.value)">' +
+                '<select onchange="updateUserField(\'' + user.id + '\', \'subscription_status\', this.value)" title="Status">' +
                     '<option value="active"' + (user.subscription_status === 'active' ? ' selected' : '') + '>Active</option>' +
                     '<option value="trial"' + (user.subscription_status === 'trial' ? ' selected' : '') + '>Trial</option>' +
                     '<option value="inactive"' + (user.subscription_status === 'inactive' ? ' selected' : '') + '>Inactive</option>' +
                     '<option value="cancelled"' + (user.subscription_status === 'cancelled' ? ' selected' : '') + '>Cancelled</option>' +
+                '</select>' +
+                '<select onchange="updateUserField(\'' + user.id + '\', \'plan\', this.value)" title="Plan">' +
+                    '<option value="none"' + (user.plan === 'none' ? ' selected' : '') + '>No Plan</option>' +
+                    '<option value="islamic"' + (user.plan === 'islamic' ? ' selected' : '') + '>Islamic</option>' +
+                    '<option value="standard"' + (user.plan === 'standard' ? ' selected' : '') + '>Standard</option>' +
+                    '<option value="all"' + (user.plan === 'all' ? ' selected' : '') + '>All-in-One</option>' +
                 '</select>' +
             '</div>' +
         '</div>';
     }).join('');
 }
 
-async function updateUserRole(userId, newRole) {
+async function updateUserField(userId, field, value) {
     try {
+        var updateData = {};
+        updateData[field] = value;
+
         var { error } = await supabaseClient
             .from('user_profiles')
-            .update({ role: newRole })
+            .update(updateData)
             .eq('id', userId);
 
         if (error) throw error;
-        showStatus('Role updated to ' + newRole, 'success');
+
+        var labels = { role: 'Role', subscription_status: 'Status', plan: 'Plan' };
+        showStatus((labels[field] || field) + ' updated to ' + value, 'success');
         loadUsers();
     } catch (e) {
-        showStatus('Error updating role: ' + e.message, 'error');
-    }
-}
-
-async function updateUserStatus(userId, newStatus) {
-    try {
-        var { error } = await supabaseClient
-            .from('user_profiles')
-            .update({ subscription_status: newStatus })
-            .eq('id', userId);
-
-        if (error) throw error;
-        showStatus('Subscription updated to ' + newStatus, 'success');
-        loadUsers();
-    } catch (e) {
-        showStatus('Error updating status: ' + e.message, 'error');
+        showStatus('Error updating: ' + e.message, 'error');
     }
 }
 

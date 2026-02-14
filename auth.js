@@ -146,6 +146,28 @@ async function requireAuth() {
         return false;
     }
 
+    // Check plan-based access — block if user doesn't have the right plan for this tool
+    const currentPage = window.location.pathname.split('/').pop();
+    const userPlan = getCurrentUserPlan();
+    const userRole = getCurrentUserRole();
+
+    // Admins can access everything
+    if (userRole !== 'admin' && PLAN_ACCESS[currentPage]) {
+        const allowedPlans = PLAN_ACCESS[currentPage];
+        if (!allowedPlans.includes(userPlan)) {
+            document.body.innerHTML =
+                '<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:Inter,sans-serif;background:#f8fafc;">' +
+                    '<div style="text-align:center;padding:2rem;background:white;border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,0.08);max-width:420px;">' +
+                        '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="1.5" style="margin-bottom:1rem;"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>' +
+                        '<h2 style="margin:0 0 0.5rem;color:#1e293b;">Access Restricted</h2>' +
+                        '<p style="color:#64748b;margin:0 0 1.5rem;">This tool is not included in your current plan. Please contact your administrator to upgrade your access.</p>' +
+                        '<a href="index.html" style="display:inline-block;padding:0.75rem 2rem;background:#1e3a5f;color:white;border-radius:8px;text-decoration:none;font-weight:500;">Go to Home</a>' +
+                    '</div>' +
+                '</div>';
+            return false;
+        }
+    }
+
     return true;
 }
 
@@ -199,3 +221,18 @@ function getCurrentUserId() {
 function getCurrentUserRole() {
     return currentProfile ? currentProfile.role : null;
 }
+
+function getCurrentUserPlan() {
+    return currentProfile ? currentProfile.plan : 'none';
+}
+
+// ========================================
+// Plan Access Map - which plans allow which tools
+// ========================================
+
+const PLAN_ACCESS = {
+    'islamic-will.html': ['islamic', 'all'],
+    'lpa.html':          ['islamic', 'all'],
+    'will-standard.html': ['standard', 'all'],
+    'lpa-standard.html':  ['standard', 'all']
+};

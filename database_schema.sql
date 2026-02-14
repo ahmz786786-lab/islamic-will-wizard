@@ -746,6 +746,7 @@ CREATE TABLE user_profiles (
     email TEXT NOT NULL,
     role TEXT NOT NULL DEFAULT 'client' CHECK (role IN ('client', 'solicitor', 'admin')),
     subscription_status TEXT NOT NULL DEFAULT 'inactive' CHECK (subscription_status IN ('active', 'inactive', 'trial', 'cancelled')),
+    plan TEXT NOT NULL DEFAULT 'none' CHECK (plan IN ('none', 'islamic', 'standard', 'all')),
     business_id UUID REFERENCES business_config(id),
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
@@ -821,10 +822,18 @@ CREATE INDEX IF NOT EXISTS idx_standard_lpas_user ON standard_lpas(user_id);
 -- ROW LEVEL SECURITY POLICIES
 -- =============================================
 
--- User Profiles: users can read/update their own profile
+-- User Profiles: users can read/update their own profile, admins can read/update all
 ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can view own profile" ON user_profiles FOR SELECT USING (auth.uid() = id);
 CREATE POLICY "Users can update own profile" ON user_profiles FOR UPDATE USING (auth.uid() = id);
+-- Admin: can view all profiles (checks role in user_profiles)
+CREATE POLICY "Admins can view all profiles" ON user_profiles FOR SELECT USING (
+    EXISTS (SELECT 1 FROM user_profiles WHERE id = auth.uid() AND role = 'admin')
+);
+-- Admin: can update all profiles
+CREATE POLICY "Admins can update all profiles" ON user_profiles FOR UPDATE USING (
+    EXISTS (SELECT 1 FROM user_profiles WHERE id = auth.uid() AND role = 'admin')
+);
 
 -- Solicitor Clients: solicitors can manage their own clients
 ALTER TABLE solicitor_clients ENABLE ROW LEVEL SECURITY;
