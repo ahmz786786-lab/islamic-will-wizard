@@ -1790,6 +1790,7 @@ select.form-input {
 
     .header-nav {
         justify-content: center;
+        flex-wrap: wrap;
     }
 
     .step-header h2 {
