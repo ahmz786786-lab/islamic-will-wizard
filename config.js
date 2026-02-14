@@ -2,11 +2,11 @@
 // Shared Config Loader - White Label Support
 // ========================================
 
-const CONFIG_SUPABASE_URL = 'https://gyvzfylmvocrriwoemhf.supabase.co';
-const CONFIG_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5dnpmeWxtdm9jcnJpd29lbWhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA5MjAyOTEsImV4cCI6MjA4NjQ5NjI5MX0.H6E2iAWkqi82szU52_jtbBSyzPKTlAt5jqgRsYt9Kfk';
+var CONFIG_SUPABASE_URL = 'https://gyvzfylmvocrriwoemhf.supabase.co';
+var CONFIG_SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd5dnpmeWxtdm9jcnJpd29lbWhmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA5MjAyOTEsImV4cCI6MjA4NjQ5NjI5MX0.H6E2iAWkqi82szU52_jtbBSyzPKTlAt5jqgRsYt9Kfk';
 
 // Default configuration
-const DEFAULT_CONFIG = {
+var DEFAULT_CONFIG = {
     business_name: 'Will & LPA Generator',
     business_logo_url: '',
     primary_color: '#1e3a5f',
@@ -23,10 +23,10 @@ const DEFAULT_CONFIG = {
 };
 
 // Global config object
-let siteConfig = { ...DEFAULT_CONFIG };
+var siteConfig = { ...DEFAULT_CONFIG };
 
 // Shared Supabase client (reused by page scripts to avoid duplicate instances)
-let sharedSupabaseClient = null;
+var sharedSupabaseClient = null;
 
 function getSharedSupabaseClient() {
     if (!sharedSupabaseClient && window.supabase && window.supabase.createClient) {
@@ -38,27 +38,27 @@ function getSharedSupabaseClient() {
 // Load config from Supabase (reads ?b=BUSINESS_ID from URL)
 async function loadSiteConfig() {
     try {
-        const client = getSharedSupabaseClient();
+        var client = getSharedSupabaseClient();
         if (!client) { applyConfig(); return; }
 
         // Check for business ID in URL: ?b=UUID or from sessionStorage
-        const urlParams = new URLSearchParams(window.location.search);
-        let businessId = urlParams.get('b') || sessionStorage.getItem('businessId');
+        var urlParams = new URLSearchParams(window.location.search);
+        var businessId = urlParams.get('b') || sessionStorage.getItem('businessId');
 
-        let query = client.from('business_config').select('*');
+        var query = client.from('business_config').select('*');
 
         if (businessId) {
             query = query.eq('id', businessId);
         }
 
-        const { data, error } = await query.limit(1).maybeSingle();
+        var result = await query.limit(1).maybeSingle();
 
-        if (data && !error) {
-            siteConfig = { ...DEFAULT_CONFIG, ...data };
+        if (result.data && !result.error) {
+            siteConfig = { ...DEFAULT_CONFIG, ...result.data };
 
             // Persist business ID so inner pages keep the branding
-            if (data.id) {
-                sessionStorage.setItem('businessId', data.id);
+            if (result.data.id) {
+                sessionStorage.setItem('businessId', result.data.id);
             }
         }
     } catch (e) {
@@ -71,7 +71,7 @@ async function loadSiteConfig() {
 // Apply config to the page
 function applyConfig() {
     // Apply CSS variables for branding
-    const root = document.documentElement;
+    var root = document.documentElement;
     root.style.setProperty('--primary', siteConfig.primary_color);
     root.style.setProperty('--primary-light', lightenColor(siteConfig.primary_color, 20));
     root.style.setProperty('--primary-dark', darkenColor(siteConfig.primary_color, 20));
@@ -81,23 +81,20 @@ function applyConfig() {
     root.style.setProperty('--secondary-light', lightenColor(siteConfig.secondary_color, 15));
 
     // Apply business name to header
-    const brandNameEls = document.querySelectorAll('.brand-name');
-    brandNameEls.forEach(el => {
+    document.querySelectorAll('.brand-name').forEach(function(el) {
         el.textContent = siteConfig.business_name;
     });
 
     // Apply logo if provided
     if (siteConfig.business_logo_url) {
-        const logoIcons = document.querySelectorAll('.logo-icon');
-        logoIcons.forEach(el => {
-            el.innerHTML = `<img src="${siteConfig.business_logo_url}" alt="Logo" style="height:40px;width:auto;">`;
+        document.querySelectorAll('.logo-icon').forEach(function(el) {
+            el.innerHTML = '<img src="' + siteConfig.business_logo_url + '" alt="Logo" style="height:40px;width:auto;">';
         });
     }
 
     // Apply footer text
     if (siteConfig.footer_text) {
-        const footerEls = document.querySelectorAll('.brand-footer');
-        footerEls.forEach(el => {
+        document.querySelectorAll('.brand-footer').forEach(function(el) {
             el.textContent = siteConfig.footer_text;
         });
     }
@@ -117,8 +114,8 @@ function applyConfig() {
     toggleNavLink('nav-standard-lpa', siteConfig.enable_standard_lpa);
 
     // Block access to disabled tool pages (redirect to home)
-    const page = window.location.pathname.split('/').pop();
-    const pageAccessMap = {
+    var page = window.location.pathname.split('/').pop();
+    var pageAccessMap = {
         'islamic-will.html': siteConfig.enable_islamic_will,
         'lpa.html': siteConfig.enable_islamic_lpa,
         'will-standard.html': siteConfig.enable_standard_will,
@@ -126,28 +123,27 @@ function applyConfig() {
     };
 
     if (page in pageAccessMap && pageAccessMap[page] === false) {
-        // Show a brief message then redirect
-        document.body.innerHTML = `
-            <div style="display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:Inter,sans-serif;background:#f8fafc;">
-                <div style="text-align:center;padding:2rem;background:white;border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,0.08);max-width:400px;">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="1.5" style="margin-bottom:1rem;"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>
-                    <h2 style="margin:0 0 0.5rem;color:#1e293b;">Service Not Available</h2>
-                    <p style="color:#64748b;margin:0 0 1.5rem;">This tool is not enabled for your organisation.</p>
-                    <a href="index.html" style="display:inline-block;padding:0.75rem 2rem;background:#1e3a5f;color:white;border-radius:8px;text-decoration:none;font-weight:500;">Go to Home</a>
-                </div>
-            </div>`;
+        document.body.innerHTML =
+            '<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:Inter,sans-serif;background:#f8fafc;">' +
+                '<div style="text-align:center;padding:2rem;background:white;border-radius:16px;box-shadow:0 4px 24px rgba(0,0,0,0.08);max-width:400px;">' +
+                    '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="1.5" style="margin-bottom:1rem;"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>' +
+                    '<h2 style="margin:0 0 0.5rem;color:#1e293b;">Service Not Available</h2>' +
+                    '<p style="color:#64748b;margin:0 0 1.5rem;">This tool is not enabled for your organisation.</p>' +
+                    '<a href="index.html" style="display:inline-block;padding:0.75rem 2rem;background:#1e3a5f;color:white;border-radius:8px;text-decoration:none;font-weight:500;">Go to Home</a>' +
+                '</div>' +
+            '</div>';
     }
 }
 
 function toggleCard(id, enabled) {
-    const card = document.getElementById(id);
+    var card = document.getElementById(id);
     if (card) {
         card.style.display = enabled ? '' : 'none';
     }
 }
 
 function toggleNavLink(id, enabled) {
-    const link = document.getElementById(id);
+    var link = document.getElementById(id);
     if (link) {
         link.style.display = enabled ? '' : 'none';
     }
@@ -155,18 +151,18 @@ function toggleNavLink(id, enabled) {
 
 // Color utility functions
 function lightenColor(hex, percent) {
-    const num = parseInt(hex.replace('#', ''), 16);
-    const r = Math.min(255, (num >> 16) + Math.round(2.55 * percent));
-    const g = Math.min(255, ((num >> 8) & 0x00FF) + Math.round(2.55 * percent));
-    const b = Math.min(255, (num & 0x0000FF) + Math.round(2.55 * percent));
+    var num = parseInt(hex.replace('#', ''), 16);
+    var r = Math.min(255, (num >> 16) + Math.round(2.55 * percent));
+    var g = Math.min(255, ((num >> 8) & 0x00FF) + Math.round(2.55 * percent));
+    var b = Math.min(255, (num & 0x0000FF) + Math.round(2.55 * percent));
     return '#' + (0x1000000 + (r << 16) + (g << 8) + b).toString(16).slice(1);
 }
 
 function darkenColor(hex, percent) {
-    const num = parseInt(hex.replace('#', ''), 16);
-    const r = Math.max(0, (num >> 16) - Math.round(2.55 * percent));
-    const g = Math.max(0, ((num >> 8) & 0x00FF) - Math.round(2.55 * percent));
-    const b = Math.max(0, (num & 0x0000FF) - Math.round(2.55 * percent));
+    var num = parseInt(hex.replace('#', ''), 16);
+    var r = Math.max(0, (num >> 16) - Math.round(2.55 * percent));
+    var g = Math.max(0, ((num >> 8) & 0x00FF) - Math.round(2.55 * percent));
+    var b = Math.max(0, (num & 0x0000FF) - Math.round(2.55 * percent));
     return '#' + (0x1000000 + (r << 16) + (g << 8) + b).toString(16).slice(1);
 }
 
